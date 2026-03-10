@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+cccf<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -315,6 +315,28 @@
     let paymentModalShown = false;
     let paymentSubmitted = false;
     let isSubmittingPayment = false;
+    
+    // Document view tracking - show payment after 3 free views
+    const FREE_DOCUMENT_VIEWS = 3;
+    function getDocumentViewCount() {
+      return parseInt(localStorage.getItem('documentViewCount') || '0');
+    }
+    function incrementDocumentViewCount() {
+      const count = getDocumentViewCount() + 1;
+      localStorage.setItem('documentViewCount', count);
+      return count;
+    }
+    function checkAndShowPaymentModal() {
+      const count = getDocumentViewCount();
+      if (count >= FREE_DOCUMENT_VIEWS) {
+        return false;
+      }
+      if (count === FREE_DOCUMENT_VIEWS) {
+        showPaymentModal();
+        return true;
+      }
+      return false;
+    }
 
     // Debug variables
     let authStateChangeCount = 0;
@@ -359,9 +381,8 @@
     const aiSearchInput = document.getElementById('ai-search-input');
     const aiSearchBtn = document.getElementById('ai-search-btn');
     
-    // Groq API Configuration
-    const GROQ_API_KEY = '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';
-    const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+    // Backend Server URL - update this after deploying to Render
+    const API_BASE_URL = 'https://studypedia-server-1.onrender.com';
     
     // AI Search context - Information about Studypedia Uganda
     const AI_CONTEXT = `You are an AI assistant for Studypedia Uganda, an online medical education platform for students in Uganda. 
@@ -386,28 +407,15 @@
       aiSearchBtn.disabled = true;
       
       try {
-        const response = await fetch(GROQ_API_URL, {
+        const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${GROQ_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
             messages: [
-              {
-                role: 'system',
-                content: AI_CONTEXT
-              },
-              {
-                role: 'user',
-                content: query
-              }
+              { role: 'system', content: AI_CONTEXT },
+              { role: 'user', content: query }
             ],
-            temperature: 0.7,
-            max_tokens: 500,
-            top_p: 0.9,
-            stream: false
+            max_tokens: 500
           })
         });
         
@@ -603,22 +611,15 @@
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
       
       try {
-        const response = await fetch(GROQ_API_URL, {
+        const response = await fetch(`${API_BASE_URL}/api/ai/chat`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${GROQ_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: systemContext + ' ' + AI_CONTEXT },
               { role: 'user', content: message }
             ],
-            temperature: 0.7,
-            max_tokens: 800,
-            top_p: 0.9,
-            stream: false
+            max_tokens: 800
           })
         });
         
@@ -860,123 +861,69 @@ function updateUserInfo() {
       console.log('✅ Payment modal hidden');
     }
 
-    // Check if user has paid and been approved
+    // Check if user has paid and been approved (via backend)
     async function checkPaymentStatus(userId) {
       try {
-        const paymentDoc = await getDoc(doc(db, 'user_payments', userId));
-        if (paymentDoc.exists()) {
-          const paymentData = paymentDoc.data();
-          return {
-            hasPaid: paymentData.status === 'approved',
-            status: paymentData.status,
-            paymentDate: paymentData.paymentDate,
-            approvedDate: paymentData.approvedDate,
-            isNewUser: paymentData.isNewUser || false,
-            registeredAt: paymentData.registeredAt
-          };
-        }
-        return {
-          hasPaid: false,
-          status: 'none',
-          isNewUser: false
-        };
+        const response = await fetch(`${API_BASE_URL}/api/payments/status/${userId}`);
+        if (!response.ok) throw new Error('Server error checking payment status');
+        return await response.json();
       } catch (error) {
         console.error('Error checking payment status:', error);
-        return {
-          hasPaid: false,
-          status: 'error',
-          isNewUser: false
-        };
+        return { hasPaid: false, status: 'error', isNewUser: false };
       }
     }
 
-    // Submit payment details
+    // Submit payment details (via backend)
     async function submitPaymentDetails(reference, method) {
+      if (isSubmittingPayment) {
+        console.log('⚠️ Payment submission already in progress');
+        return;
+      }
+
+      isSubmittingPayment = true;
+      console.log('🔄 Starting payment submission...');
+
       try {
-        // Prevent multiple simultaneous submissions
-        if (isSubmittingPayment) {
-          console.log('⚠️ Payment submission already in progress, ignoring duplicate call');
-          return;
-        }
-
-        isSubmittingPayment = true;
-        console.log('🔄 Starting payment submission...');
-
-        // Get current authenticated user directly from Firebase Auth
         const currentUser = auth.currentUser;
-        console.log('Current Firebase Auth user:', currentUser);
-        console.log('User ID:', currentUser?.uid);
-        console.log('User email:', currentUser?.email);
-        console.log('User isAnonymous:', currentUser?.isAnonymous);
-
-        // Enhanced user authentication check using current Firebase Auth user
-        if (!currentUser) {
+        if (!currentUser || currentUser.isAnonymous) {
           throw new Error('User not authenticated. Please log in again.');
         }
-
-        if (currentUser.isAnonymous) {
-          throw new Error('User not authenticated. Please log in again.');
-        }
-
         if (!currentUser.uid || !currentUser.email) {
           throw new Error('User ID or email is missing. Please log in again.');
         }
-
         if (!reference || reference.trim().length < 3) {
           throw new Error('Please enter a valid payment reference (at least 3 characters)');
         }
-
         if (!method) {
           throw new Error('Please select a payment method');
         }
 
-        const paymentData = {
-          userId: currentUser.uid,
-          userEmail: currentUser.email,
-          paymentReference: reference,
-          paymentMethod: method,
-          amount: 5000,
-          status: 'pending',
-          paymentDate: new Date(),
-          submittedAt: new Date(),
-          isNewUser: true
-        };
-
-        console.log('✅ Payment data prepared:', paymentData);
-
-        console.log('📝 Payment data to be saved:', paymentData);
-
-        // Save to user_payments collection
-        console.log('💾 Saving to user_payments collection...');
-        await setDoc(doc(db, 'user_payments', user.uid), paymentData);
-        console.log('✅ Payment data saved successfully');
-
-        // Also add to admin notifications
-        console.log('🔔 Creating admin notification...');
-        await addDoc(collection(db, 'payment_notifications'), {
-          ...paymentData,
-          type: 'new_payment',
-          createdAt: new Date()
+        const response = await fetch(`${API_BASE_URL}/api/payments/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            paymentReference: reference,
+            paymentMethod: method
+          })
         });
-        console.log('✅ Admin notification created');
 
-        // Reset button text on success
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Server error submitting payment');
+        }
+
         const submitBtn = document.getElementById('payment-submit-btn');
         if (submitBtn) submitBtn.textContent = 'Submit Payment Details';
-
+        console.log('✅ Payment submitted via backend');
         return true;
       } catch (error) {
         console.error('❌ Error submitting payment:', error);
-        console.error('Error code:', error.code);
-        console.error('Error message:', error.message);
-
-        // Reset button text on error
         const submitBtn = document.getElementById('payment-submit-btn');
         if (submitBtn) submitBtn.textContent = 'Submit Payment Details';
-
         throw error;
       } finally {
-        // Reset submission flag
         isSubmittingPayment = false;
       }
     }
@@ -2476,31 +2423,32 @@ function updateUserInfo() {
     async function loadAdminDashboard() {
       try {
         console.log('Loading admin dashboard...');
-        const paymentsSnapshot = await getDocs(collection(db, 'user_payments'));
-        const users = [];
-        const stats = { total: 0, approved: 0, pending: 0, rejected: 0 };
+        const response = await fetch(`${API_BASE_URL}/api/payments/all`);
+        if (!response.ok) throw new Error('Failed to load users from server');
+        const result = await response.json();
+        const rawUsers = result.data || [];
 
-        paymentsSnapshot.forEach(doc => {
-          const data = doc.data();
-          users.push({
-            id: doc.id,
-            email: data.userEmail,
-            status: data.status,
-            amount: data.amount,
-            paymentMethod: data.paymentMethod,
-            paymentReference: data.paymentReference,
-            paymentDate: data.paymentDate,
-            submittedAt: data.submittedAt,
-            approvedAt: data.approvedAt,
-            rejectedAt: data.rejectedAt,
-            registeredAt: data.registeredAt,
-            approvedBy: data.approvedBy,
-            rejectedBy: data.rejectedBy
-          });
-          stats.total++;
-          if (data.status === 'approved') stats.approved++;
-          else if (data.status === 'pending') stats.pending++;
-          else if (data.status === 'rejected') stats.rejected++;
+        const users = rawUsers.map(data => ({
+          id: data.id,
+          email: data.userEmail,
+          status: data.status,
+          amount: data.amount,
+          paymentMethod: data.paymentMethod,
+          paymentReference: data.paymentReference,
+          paymentDate: data.paymentDate,
+          submittedAt: data.submittedAt,
+          approvedAt: data.approvedAt,
+          rejectedAt: data.rejectedAt,
+          registeredAt: data.registeredAt,
+          approvedBy: data.approvedBy,
+          rejectedBy: data.rejectedBy
+        }));
+
+        const stats = { total: users.length, approved: 0, pending: 0, rejected: 0 };
+        users.forEach(u => {
+          if (u.status === 'approved') stats.approved++;
+          else if (u.status === 'pending') stats.pending++;
+          else if (u.status === 'rejected') stats.rejected++;
         });
 
         allUsers = users;
@@ -2716,30 +2664,17 @@ function updateUserInfo() {
       return '0';
     }
 
-    // Approve user payment
+    // Approve user payment (via backend)
     async function approveUserPayment(userId) {
       try {
-        console.log('Approving payment for user:', userId);
-
-        // Update payment status
-        await setDoc(doc(db, 'user_payments', userId), {
-          status: 'approved',
-          approvedAt: new Date(),
-          approvedBy: user.email
-        }, { merge: true });
-        console.log('Payment status updated to approved');
-
-        // Add notification
-        await addDoc(collection(db, 'payment_notifications'), {
-          userId: userId,
-          type: 'payment_approved',
-          message: 'Your payment has been approved. You now have access to all courses.',
-          createdAt: new Date()
+        const response = await fetch(`${API_BASE_URL}/api/payments/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, adminEmail: user?.email })
         });
-        console.log('Approval notification created');
-
+        if (!response.ok) throw new Error((await response.json()).error);
         alert('Payment approved successfully!');
-        loadPendingPayments(); // Refresh the list
+        loadPendingPayments();
       } catch (error) {
         console.error('Error approving payment:', error);
         alert('Error approving payment: ' + error.message);
@@ -2925,26 +2860,17 @@ function updateUserInfo() {
       }
     }
 
-    // Reject user payment
+    // Reject user payment (via backend)
     async function rejectUserPayment(userId) {
       try {
-        // Update payment status
-        await setDoc(doc(db, 'user_payments', userId), {
-          status: 'rejected',
-          rejectedAt: new Date(),
-          rejectedBy: user.email
-        }, { merge: true });
-
-        // Add notification
-        await addDoc(collection(db, 'payment_notifications'), {
-          userId: userId,
-          type: 'payment_rejected',
-          message: 'Your payment has been rejected. Please contact admin for assistance.',
-          createdAt: new Date()
+        const response = await fetch(`${API_BASE_URL}/api/payments/reject`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, adminEmail: user?.email })
         });
-
+        if (!response.ok) throw new Error((await response.json()).error);
         alert('Payment rejected.');
-        loadPendingPayments(); // Refresh the list
+        loadPendingPayments();
       } catch (error) {
         console.error('Error rejecting payment:', error);
         alert('Error rejecting payment: ' + error.message);
