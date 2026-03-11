@@ -440,7 +440,7 @@
     
     // Document view tracking - show payment after 2 free views
     const ADMIN_EMAIL = 'kaigwaakram123@gmail.com';
-    const FREE_DOCUMENT_VIEWS = 2;
+    const FREE_DOCUMENT_VIEWS = 3;
     function getDocumentViewCount() {
       return parseInt(localStorage.getItem('documentViewCount') || '0');
     }
@@ -1146,7 +1146,8 @@ function updateUserInfo() {
             phone: formattedPhone,
             network: selectedNetwork,
             plan: selectedPlan,
-            email: user?.email || 'user@studypedia.ug'
+            email: user?.email || 'user@studypedia.ug',
+            userId: user?.uid
           })
         });
         
