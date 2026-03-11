@@ -2813,7 +2813,18 @@ function updateUserInfo() {
       }
 
       const usersHtml = filteredUsers.map(user => {
-        const date = user.paymentDate ? new Date(user.paymentDate.toDate()).toLocaleDateString() : 'N/A';
+        // Handle both Firestore Timestamp and plain date strings
+        let dateStr = 'N/A';
+        if (user.paymentDate) {
+          try {
+            const dateObj = typeof user.paymentDate.toDate === 'function' 
+              ? user.paymentDate.toDate() 
+              : new Date(user.paymentDate);
+            dateStr = dateObj.toLocaleDateString();
+          } catch (e) {
+            dateStr = 'N/A';
+          }
+        }
         const statusBadge = getStatusBadge(user.status);
         const isChecked = selectedUsers.has(user.id) ? 'checked' : '';
 
@@ -2831,7 +2842,7 @@ function updateUserInfo() {
                     <p>Amount: UGX ${user.amount?.toLocaleString() || 'N/A'}</p>
                     <p>Method: ${user.paymentMethod || 'N/A'}</p>
                     <p>Reference: ${user.paymentReference || 'N/A'}</p>
-                    <p>Date: ${date}</p>
+                    <p>Date: ${dateStr}</p>
                   </div>
                 </div>
               </div>
@@ -2846,6 +2857,10 @@ function updateUserInfo() {
                     Reject
                   </button>
                 ` : ''}
+                <button onclick="window.deleteSingleUser('${user.id}')"
+                        class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -2953,11 +2968,31 @@ function updateUserInfo() {
       }
     }
 
+    async function deleteSingleUser(userId) {
+      if (confirm('Are you sure you want to DELETE this user? This cannot be undone!')) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/payments/delete/${userId}?adminEmail=${encodeURIComponent(ADMIN_EMAIL)}`, {
+            method: 'DELETE'
+          });
+          const result = await response.json();
+          if (result.success) {
+            alert('User deleted successfully!');
+            await loadAdminDashboard(); // Refresh the dashboard
+          } else {
+            alert('Error: ' + result.error);
+          }
+        } catch (error) {
+          alert('Error deleting user: ' + error.message);
+        }
+      }
+    }
+
     // Make functions globally available
     window.bulkApproveUsers = bulkApproveUsers;
     window.bulkRejectUsers = bulkRejectUsers;
     window.approveSingleUser = approveSingleUser;
     window.rejectSingleUser = rejectSingleUser;
+    window.deleteSingleUser = deleteSingleUser;
     window.loadAdminDashboard = loadAdminDashboard;
 
     async function bulkApproveUsers() {
@@ -3101,7 +3136,7 @@ function updateUserInfo() {
                       <p class="text-sm text-gray-600">Amount: UGX ${payment.amount.toLocaleString()}</p>
                       <p class="text-sm text-gray-600">Method: ${payment.paymentMethod}</p>
                       <p class="text-sm text-gray-600">Reference: ${payment.paymentReference}</p>
-                      <p class="text-sm text-gray-600">Date: ${new Date(payment.paymentDate.toDate()).toLocaleDateString()}</p>
+                      <p class="text-sm text-gray-600">Date: ${payment.paymentDate ? (typeof payment.paymentDate.toDate === 'function' ? payment.paymentDate.toDate().toLocaleDateString() : new Date(payment.paymentDate).toLocaleDateString()) : 'N/A'}</p>
                     </div>
                     <div class="flex space-x-2">
                       <button onclick="approveUserPayment('${payment.userId}')"
