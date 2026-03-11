@@ -1594,15 +1594,15 @@ function updateUserInfo() {
     async function handleViewDocument(docData) {
       console.log('Attempting to view document:', docData);
       try {
+        const filePath = docData.filePath || docData['file path'] || null;
+        
         let url;
-        if (docData.filePath && docData.filePath.startsWith('http')) {
-          // Direct external link (e.g., Google Drive)
-          url = docData.filePath;
+        if (filePath && filePath.startsWith('http')) {
+          url = filePath;
           console.log('Using external URL:', url);
-        } else if (docData.filePath) {
-          // Firebase Storage path
+        } else if (filePath) {
           const storage = getStorage();
-          const fileRef = ref(storage, docData.filePath);
+          const fileRef = ref(storage, filePath);
           url = await getDownloadURL(fileRef);
           console.log('Generated Firebase Storage URL:', url);
         } else {
@@ -1618,12 +1618,14 @@ function updateUserInfo() {
       } catch (error) {
         console.error('Error accessing document for viewing:', error, 'Document data:', docData);
         const title = docData.title || 'this document';
-        if (!docData.filePath) {
+        const filePath = docData.filePath || docData['file path'] || null;
+        
+        if (!filePath) {
           alert(`Cannot view "${title}". Missing 'filePath' in Firebase document. Add a valid URL (e.g., Google Drive link) or Storage path to this document in Firestore.`);
-        } else if (docData.filePath.startsWith('http')) {
-          alert(`Failed to open external link for "${title}". URL: ${docData.filePath}. Check if it's public and accessible. Error: ${error.message}`);
+        } else if (filePath.startsWith('http')) {
+          alert(`Failed to open external link for "${title}". URL: ${filePath}. Check if it's public and accessible. Error: ${error.message}`);
         } else {
-          let errorMsg = `Failed to load "${title}" from Firebase Storage. Path: ${docData.filePath}. `;
+          let errorMsg = `Failed to load "${title}" from Firebase Storage. Path: ${filePath}. `;
           if (error.code === 'storage/object-not-found') {
             errorMsg += 'File not found—upload it to Firebase Storage at this path and ensure public access.';
           } else if (error.code === 'storage/unauthorized') {
@@ -1640,15 +1642,15 @@ function updateUserInfo() {
     async function handleDownloadDocument(docData) {
       console.log('Attempting to download document:', docData);
       try {
+        const filePath = docData.filePath || docData['file path'] || null;
+        
         let url;
-        if (docData.filePath && docData.filePath.startsWith('http')) {
-          // Direct external link (e.g., Google Drive)
-          url = docData.filePath;
+        if (filePath && filePath.startsWith('http')) {
+          url = filePath;
           console.log('Using external URL for download:', url);
-        } else if (docData.filePath) {
-          // Firebase Storage path
+        } else if (filePath) {
           const storage = getStorage();
-          const fileRef = ref(storage, docData.filePath);
+          const fileRef = ref(storage, filePath);
           url = await getDownloadURL(fileRef);
           console.log('Generated Firebase Storage URL for download:', url);
         } else {
@@ -1670,12 +1672,14 @@ function updateUserInfo() {
       } catch (error) {
         console.error('Error accessing document for download:', error, 'Document data:', docData);
         const title = docData.title || 'this document';
-        if (!docData.filePath) {
+        const filePath = docData.filePath || docData['file path'] || null;
+        
+        if (!filePath) {
           alert(`Cannot download "${title}". Missing 'filePath' in Firebase document. Add a valid URL or Storage path to this document in Firestore.`);
-        } else if (docData.filePath.startsWith('http')) {
-          alert(`Failed to download external file "${title}". URL: ${docData.filePath}. Ensure it's downloadable and public. Error: ${error.message}`);
+        } else if (filePath.startsWith('http')) {
+          alert(`Failed to download external file "${title}". URL: ${filePath}. Ensure it's downloadable and public. Error: ${error.message}`);
         } else {
-          let errorMsg = `Failed to download "${title}" from Firebase Storage. Path: ${docData.filePath}. `;
+          let errorMsg = `Failed to download "${title}" from Firebase Storage. Path: ${filePath}. `;
           if (error.code === 'storage/object-not-found') {
             errorMsg += 'File not found—upload it to Firebase Storage at this path and make public.';
           } else if (error.code === 'storage/unauthorized') {
@@ -2010,16 +2014,20 @@ function updateUserInfo() {
                   <div class="space-y-4">
                     ${documents.map(doc => {
               const displayTitle = doc.title || doc.id || 'Untitled Document';
-              if (!doc.filePath) {
-                console.warn(`Document ${doc.id} is missing 'filePath' field. Buttons will not be shown. Add 'title' (string) and 'filePath' (URL or Storage path) in Firebase.`);
+              
+              // Check for filePath - supports both 'filePath' and 'file path' (common mistake)
+              const filePath = doc.filePath || doc['file path'] || null;
+              
+              if (!filePath) {
+                console.warn(`Document ${doc.id} is missing 'filePath' field. Buttons will not be shown. Add 'title', 'filePath' (or 'file path'), and 'description' fields in Firebase.`);
                 return `
                         <div class="bg-white p-4 rounded-lg shadow-md text-center text-gray-500 border border-gray-300">
                           <span class="font-medium text-gray-700 mb-2 block">${displayTitle}</span>
-                          <p class="text-sm">Missing file path. Update this document in Firebase with 'title' and 'filePath' fields to enable read/download.</p>
+                          <p class="text-sm">Missing file path. Update this document in Firebase with 'title', 'filePath', and 'description' fields to enable read/download.</p>
                         </div>
                       `;
               }
-              const safeDoc = { ...doc, title: displayTitle };
+              const safeDoc = { ...doc, title: displayTitle, filePath: filePath };
               const jsonStr = JSON.stringify(safeDoc).replace(/"/g, '&quot;');
               return `
                       <div class="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center transition-all duration-300 ease-in-out hover:shadow-xl hover:from-blue-50 hover:to-indigo-100 border border-blue-200 hover:border-blue-300">
@@ -2039,7 +2047,7 @@ function updateUserInfo() {
                     `;
             }).join('')}
                   </div>
-                ` : `<p class="text-center text-gray-500 py-8">No documents yet for this course unit in Certificate Medical Lab Science. Use the 'Seed CLT' button (visible when logged in) to add sample documents. Ensure each document in Firebase has 'title' (string) and 'filePath' (URL or Storage path) fields for read online and download buttons to work.</p>`}
+                ` : `<p class="text-center text-gray-500 py-8">No documents yet for this course unit in Certificate Medical Lab Science. Use the 'Seed CLT' button (visible when logged in) to add sample documents. Ensure each document in Firebase has 'title' (string), 'filePath' (URL or Storage path), and 'description' (optional) fields for read online and download buttons to work.</p>`}
               </div>
             `;
           break;
