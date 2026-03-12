@@ -503,7 +503,8 @@
       // Check if user has paid
       try {
         const paymentStatus = await checkPaymentStatus(user?.uid);
-        return paymentStatus.hasPaid || paymentStatus.status === 'none';
+        // Only allow access if user has paid
+        return paymentStatus.hasPaid === true;
       } catch (error) {
         console.error('Error checking premium access:', error);
         return false;
@@ -1404,16 +1405,30 @@ function updateUserInfo() {
     }
 
 
-    const bgImages = Array.from({ length: 30 }, (_, i) => `https://picsum.photos/1920/1080?random=${i + 1}&blur=2`);
+    // Medical student background images - rotating every 30 seconds
+    const bgImages = [
+      'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=1920&q=80',
+      'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1920&q=80',
+      'https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?w=1920&q=80',
+      'https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=1920&q=80',
+      'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1920&q=80',
+      'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1920&q=80',
+      'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=1920&q=80',
+      'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=1920&q=80'
+    ];
     let bgImageIndex = 0;
 
     function cycleBgImages() {
-      // Background image cycling disabled to prevent potential issues
-      console.log('Background image cycling disabled to prevent reload issues');
-      // setInterval(() => {
-      //   bgImageIndex = (bgImageIndex + 1) % bgImages.length;
-      //   bgImageDiv.style.backgroundImage = `url('${bgImages[bgImageIndex]}')`;
-      // }, 20000); // Change image every 20 seconds
+      // Set initial background
+      if (bgImageDiv) {
+        bgImageDiv.style.backgroundImage = `url('${bgImages[0]}')`;
+        // Rotate every 30 seconds
+        setInterval(() => {
+          bgImageIndex = (bgImageIndex + 1) % bgImages.length;
+          bgImageDiv.style.backgroundImage = `url('${bgImages[bgImageIndex]}')`;
+        }, 30000); // Change every 30 seconds
+        console.log('✅ Background image cycling started - changing every 30 seconds');
+      }
     }
 
     // State Management and Rendering Functions
