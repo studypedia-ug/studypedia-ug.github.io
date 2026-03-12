@@ -44,6 +44,33 @@
       font-family: 'Inter', sans-serif;
       background-color: #f3f4f6;
     }
+    
+    /* Custom scrollbar for sidebar */
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+      background: #eff6ff;
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+      background: #93c5fd;
+      border-radius: 3px;
+    }
+    #sidebar::-webkit-scrollbar-thumb:hover {
+      background: #60a5fa;
+    }
+    
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Active menu item highlight */
+    .active-menu {
+      background-color: #dbeafe !important;
+      color: #2563eb !important;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -61,8 +88,7 @@
       <header class="bg-white shadow-md p-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
           <button id="menu-button" class="focus:outline-none p-2 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
           </button>
@@ -110,54 +136,7 @@
         </div>
       </header>
 
-      <!-- Sidebar Menu -->
-      <div id="sidebar"
-        class="fixed top-0 left-0 h-screen transform -translate-x-full transition-transform duration-500 ease-in-out bg-gradient-to-b from-white to-blue-50 w-64 shadow-2xl z-50 overflow-y-auto border-r-2 border-blue-100">
-        <div class="p-4 flex justify-end">
-          <button id="close-menu-button" class="text-gray-600 hover:text-red-500 transition-all duration-300 ease-in-out transform hover:scale-110">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        <nav class="p-4">
-          <ul class="space-y-2">
-            <li>
-              <h4 class="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent mb-2">Courses</h4>
-              <ul id="course-list" class="pl-4 space-y-2">
-                <!-- Courses will be dynamically injected here -->
-              </ul>
-
-              <!-- User Profile Section -->
-              <li id="user-profile-section" class="pt-4 border-t border-blue-200">
-                <div id="user-info" class="text-sm text-gray-700 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-inner">
-                  Loading user...
-                </div>
-              </li>
-            </li>
-            <li class="pt-4 border-t border-blue-200">
-              <button id="about-nav-button"
-                class="w-full text-left text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 transition-all duration-300 ease-in-out py-3 px-4 rounded-xl cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]">About
-                Us</button>
-            </li>
-            <li>
-              <button id="privacy-nav-button"
-                class="w-full text-left text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-teal-600 transition-all duration-300 ease-in-out py-3 px-4 rounded-xl cursor-pointer focus:outline-none focus:ring-4 focus:ring-green-300 shadow-md hover:shadow-lg transform hover:scale-[1.02]">Privacy
-                Policy</button>
-            </li>
-            <li class="pt-4 border-t border-blue-200">
-              <button id="admin-dashboard-button"
-                class="w-full text-left text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-purple-500 hover:to-indigo-600 transition-all duration-300 ease-in-out py-3 px-4 rounded-xl cursor-pointer focus:outline-none focus:ring-4 focus:ring-purple-300 shadow-md hover:shadow-lg transform hover:scale-[1.02] hidden">Admin
-                Dashboard</button>
-            </li>
-          </ul>
-        </nav>
-        <!-- AdSense Sidebar Skyscraper Ad Space -->
-        <div id="sidebar-ad" class="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl mt-4 border border-purple-200 shadow-md">
-          <div class="w-full h-80 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg shadow-inner"></div>
-        </div>
-      </div>
+      
 
       <!-- Main Content Area -->
       <main id="main-content" class="flex-grow p-4 md:p-8 flex items-center justify-center transition-all duration-500 ease-in-out">
@@ -167,6 +146,78 @@
 
     <!-- Overlay for menu -->
     <div id="menu-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+
+    <!-- Sidebar Menu -->
+    <div id="sidebar" class="fixed top-0 left-0 h-screen transform -translate-x-full transition-transform duration-500 ease-in-out bg-gradient-to-b from-white to-blue-50 w-72 shadow-2xl z-50 overflow-y-auto">
+      <div class="p-4 flex justify-between items-center border-b border-blue-100 bg-white">
+        <h3 class="text-lg font-bold text-blue-600">Menu</h3>
+        <button id="close-menu-button" class="text-gray-600 hover:text-red-500 transition-all duration-300 ease-in-out transform hover:scale-110 p-1">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <nav class="p-2">
+        <!-- Quick Links -->
+        <div class="px-4 py-2">
+          <button id="sidebar-home" class="w-full text-left flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 py-3 px-4 rounded-xl cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <span class="font-medium">Home</span>
+          </button>
+          <button id="sidebar-courses" class="w-full text-left flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 py-3 px-4 rounded-xl cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            <span class="font-medium">Courses</span>
+          </button>
+          <button id="sidebar-about" class="w-full text-left flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 py-3 px-4 rounded-xl cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="font-medium">About Us</span>
+          </button>
+          <button id="sidebar-contact" class="w-full text-left flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 py-3 px-4 rounded-xl cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <span class="font-medium">Contact</span>
+          </button>
+          <button id="sidebar-privacy" class="w-full text-left flex items-center space-x-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300 py-3 px-4 rounded-xl cursor-pointer">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            <span class="font-medium">Privacy Policy</span>
+          </button>
+        </div>
+        
+        <!-- Divider -->
+        <div class="border-t border-blue-200 my-2"></div>
+        
+        <!-- Courses Section -->
+        <div class="px-4 py-2">
+          <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-2">Browse Courses</h4>
+          <ul id="course-list" class="space-y-1"></ul>
+        </div>
+        
+        <!-- User Profile Section -->
+        <div id="user-profile-section" class="px-4 py-2 border-t border-blue-200 mt-2">
+          <div id="user-info" class="text-sm text-gray-700 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">Loading user...</div>
+        </div>
+        
+        <!-- Admin Dashboard -->
+        <div class="px-4 py-2">
+          <button id="admin-dashboard-button" class="w-full text-left flex items-center space-x-3 text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300 py-3 px-4 rounded-xl cursor-pointer hidden">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span class="font-medium">Admin Dashboard</span>
+          </button>
+        </div>
+      </nav>
+    </div>
 
     <!-- Login Modal -->
     <div id="login-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
@@ -1342,32 +1393,21 @@ function updateUserInfo() {
       isMenuOpen = !isMenuOpen;
       sidebar.classList.toggle('-translate-x-full', !isMenuOpen);
       menuOverlay.classList.toggle('hidden', !isMenuOpen);
+      
       if (isMenuOpen) {
-        document.body.style.overflow = 'hidden'; // Lock background scroll
-
-        // Allow all users to access courses - payment will be requested after viewing 2 documents
+        document.body.style.overflow = 'hidden';
+        sidebar.style.overflowY = 'auto';
+        sidebar.style.height = '100vh';
+        
         if (user && user.email === ADMIN_EMAIL) {
-          fetchCourses(); // Admin has full access
+          fetchCourses();
         } else if (user && !user.isAnonymous) {
-          // Allow all logged-in users to access courses
-          // Payment will be requested after viewing 2 documents
           fetchCourses();
         } else {
-          // Anonymous users can browse course listings only
           fetchCourses();
         }
       } else {
-        document.body.style.overflow = ''; // Restore scroll
-      }
-
-      // Ensure sidebar scroll works by preventing wheel event bubbling
-      const wheelHandler = function (e) {
-        e.stopPropagation();
-      };
-      if (isMenuOpen) {
-        sidebar.addEventListener('wheel', wheelHandler, { passive: false });
-      } else {
-        sidebar.removeEventListener('wheel', wheelHandler);
+        document.body.style.overflow = '';
       }
     }
 
@@ -1594,7 +1634,7 @@ function updateUserInfo() {
     async function handleViewDocument(docData) {
       console.log('Attempting to view document:', docData);
       try {
-        const filePath = docData.filePath || docData['file path'] || null;
+        const filePath = docData.filePath || docData.filepath || docData['file path'] || null;
         
         let url;
         if (filePath && filePath.startsWith('http')) {
@@ -2015,8 +2055,8 @@ function updateUserInfo() {
                     ${documents.map(doc => {
               const displayTitle = doc.title || doc.id || 'Untitled Document';
               
-              // Check for filePath - supports both 'filePath' and 'file path' (common mistake)
-              const filePath = doc.filePath || doc['file path'] || null;
+              // Check for filePath - supports 'filePath', 'filepath', and 'file path'
+              const filePath = doc.filePath || doc.filepath || doc['file path'] || null;
               
               if (!filePath) {
                 console.warn(`Document ${doc.id} is missing 'filePath' field. Buttons will not be shown. Add 'title', 'filePath' (or 'file path'), and 'description' fields in Firebase.`);
@@ -3384,6 +3424,13 @@ function updateUserInfo() {
         backButton.addEventListener('touchend', function(e) {
           this.style.transform = '';
           handleBack();
+        });
+
+        // Close menu on Escape key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && isMenuOpen) {
+            toggleMenu();
+          }
         });
 
         // Single event delegation for all other elements (static and dynamic)
