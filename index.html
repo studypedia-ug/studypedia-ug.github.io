@@ -318,9 +318,14 @@
     </div>
 
     <!-- Payment Prompt Modal -->
-    <div id="payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4">
-        <div class="p-6">
+    <div id="payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" onclick="if(event.target === this) hidePaymentModal()">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 relative">
+        <button id="close-payment-modal" class="absolute top-3 right-3 text-white bg-red-500 hover:bg-red-600 rounded-full p-3 w-12 h-12 flex items-center justify-center z-10 shadow-lg" title="Close">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <div class="p-6 pt-10">
           <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
             <svg class="w-6 h-6 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -384,6 +389,10 @@
             Pay with Mobile Money
           </button>
           
+          <button type="button" id="browse-free-btn" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md transition-colors font-semibold" onclick="hidePaymentModal()">
+            Continue Browsing for Free
+          </button>
+          
           <p class="mt-3 text-center text-xs text-gray-500">
             Secured by Pesapal. Payment processed securely.
           </p>
@@ -392,11 +401,6 @@
             <button id="contact-admin" class="text-blue-500 hover:underline">Contact Admin</button> |
             <button id="logout-instead" class="text-red-500 hover:underline">Logout Instead</button>
           </p>
-          <button id="close-payment-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
         </div>
       </div>
     </div>
@@ -489,6 +493,28 @@
     let paymentSubmitted = false;
     let isSubmittingPayment = false;
     
+    // Check if user can access premium content
+    async function canAccessPremium() {
+      // Admin always has access
+      if (user && user.email === ADMIN_EMAIL) {
+        return true;
+      }
+      
+      // Check if user has paid
+      try {
+        const paymentStatus = await checkPaymentStatus(user?.uid);
+        return paymentStatus.hasPaid || paymentStatus.status === 'none';
+      } catch (error) {
+        console.error('Error checking premium access:', error);
+        return false;
+      }
+    }
+
+    // Show payment modal for premium content
+    function showPaymentForPremium() {
+      showPaymentModal();
+    }
+
     // Document view tracking - show payment after 2 free views
     const ADMIN_EMAIL = 'kaigwaakram123@gmail.com';
     const FREE_DOCUMENT_VIEWS = 3;
@@ -587,8 +613,7 @@
     // For production: use your deployed server URL
     const PRODUCTION_SERVER_URL = 'https://studypedia-server-1.onrender.com';
     const isLocalhost = window.location.hostname === 'localhost' || 
-                        window.location.hostname === '127.0.0.1' ||
-                        window.location.hostname.includes('.local');
+                        window.location.hostname === '127.0.0.1';
     const API_BASE_URL = isLocalhost ? 'http://localhost:3000' : PRODUCTION_SERVER_URL;
     
     // AI Search context - Information about Studypedia Uganda
@@ -879,7 +904,8 @@ async function registerUser(email, password) {
       status: 'pending',
       amount: 5000,
       registeredAt: new Date(),
-      isNewUser: true
+      isNewUser: true,
+      loginMethod: 'email'
     });
 
     alert('Registration successful! Welcome to Studypedia Uganda.');
@@ -1119,6 +1145,7 @@ function updateUserInfo() {
 
     function hidePaymentModal() {
       console.log('🔒 hidePaymentModal() called');
+      paymentModalShown = false;
       hideModal(paymentModal);
       // Reset submission flag when modal is closed
       isSubmittingPayment = false;
@@ -1306,6 +1333,7 @@ function updateUserInfo() {
     // Make functions globally accessible
     window.initiatePesapalPayment = initiatePesapalPayment;
     window.checkPesapalStatus = checkPesapalStatus;
+    window.hidePaymentModal = hidePaymentModal;
     window.closePesapalIframe = closePesapalIframe;
 
     // Check if user has paid and been approved (via backend)
@@ -1633,6 +1661,17 @@ function updateUserInfo() {
 
     async function handleViewDocument(docData) {
       console.log('Attempting to view document:', docData);
+      
+      // Check if document is premium
+      if (docData.status === 'premium') {
+        const hasAccess = await canAccessPremium();
+        if (!hasAccess) {
+          alert('This is a PREMIUM document. Please subscribe to access premium content.');
+          showPaymentModal();
+          return;
+        }
+      }
+      
       try {
         const filePath = docData.filePath || docData.filepath || docData['file path'] || null;
         
@@ -1681,6 +1720,17 @@ function updateUserInfo() {
     
     async function handleDownloadDocument(docData) {
       console.log('Attempting to download document:', docData);
+      
+      // Check if document is premium
+      if (docData.status === 'premium') {
+        const hasAccess = await canAccessPremium();
+        if (!hasAccess) {
+          alert('This is a PREMIUM document. Please subscribe to download premium content.');
+          showPaymentModal();
+          return;
+        }
+      }
+      
       try {
         const filePath = docData.filePath || docData['file path'] || null;
         
@@ -2058,29 +2108,38 @@ function updateUserInfo() {
               // Check for filePath - supports 'filePath', 'filepath', and 'file path'
               const filePath = doc.filePath || doc.filepath || doc['file path'] || null;
               
+              // Normalize status field (handle Firebase object format like { stringValue: 'premium' })
+              const docStatus = (doc.status && typeof doc.status === 'object' && doc.status.stringValue) ? doc.status.stringValue : doc.status;
+              
               if (!filePath) {
-                console.warn(`Document ${doc.id} is missing 'filePath' field. Buttons will not be shown. Add 'title', 'filePath' (or 'file path'), and 'description' fields in Firebase.`);
+                console.warn(`Document ${doc.id} is missing 'filePath' field. Buttons will not be shown. Add 'title', 'filePath' (or 'filepath'), 'description', and optionally 'status: premium' fields in Firebase.`);
                 return `
                         <div class="bg-white p-4 rounded-lg shadow-md text-center text-gray-500 border border-gray-300">
-                          <span class="font-medium text-gray-700 mb-2 block">${displayTitle}</span>
-                          <p class="text-sm">Missing file path. Update this document in Firebase with 'title', 'filePath', and 'description' fields to enable read/download.</p>
+                          <div class="flex items-center justify-center gap-2 mb-2">
+                            <span class="font-medium text-gray-700">${displayTitle}</span>
+                            ${docStatus === 'premium' ? '<span class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold">PREMIUM</span>' : ''}
+                          </div>
+                          <p class="text-sm">Missing file path. Update this document in Firebase with 'title', 'filePath', 'description', and optionally 'status: premium' fields.</p>
                         </div>
                       `;
               }
-              const safeDoc = { ...doc, title: displayTitle, filePath: filePath };
-              const jsonStr = JSON.stringify(safeDoc).replace(/"/g, '&quot;');
+              const safeDoc = { ...doc, title: displayTitle, filePath: filePath, status: docStatus };
+              const jsonStr = JSON.stringify(safeDoc).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
               return `
                       <div class="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center transition-all duration-300 ease-in-out hover:shadow-xl hover:from-blue-50 hover:to-indigo-100 border border-blue-200 hover:border-blue-300">
-                        <div class="text-center sm:text-left mb-2 sm:mb-0">
-                          <span class="font-semibold text-gray-800 text-lg">${displayTitle}</span>
+                        <div class="text-center sm:text-left mb-2 sm:mb-0 flex-1">
+                          <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                            <span class="font-semibold text-gray-800 text-lg">${displayTitle}</span>
+                            ${docStatus === 'premium' ? '<span class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-sm">PREMIUM</span>' : ''}
+                          </div>
                           ${doc.description ? `<p class="text-sm text-gray-600 mt-1 italic">${doc.description}</p>` : ''}
                         </div>
                         <div class="flex flex-row space-x-3 mt-3 sm:mt-0">
-                          <button class="view-doc bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm py-3 px-6 rounded-full hover:from-green-600 hover:to-emerald-700 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl" data-doc="${jsonStr}">
-                            Read Online
+                          <button class="view-doc ${docStatus === 'premium' ? 'bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700' : 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700'} text-white font-bold text-sm py-3 px-6 rounded-full hover:scale-105 transition-all duration-300 ease-in-out transform shadow-lg hover:shadow-xl" data-doc="${jsonStr}">
+                            ${docStatus === 'premium' ? '🔒 Read Online' : '📖 Read Online'}
                           </button>
-                          <button class="download-doc bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-sm py-3 px-6 rounded-full hover:from-blue-700 hover:to-indigo-800 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl" data-doc="${jsonStr}">
-                            Download
+                          <button class="download-doc ${docStatus === 'premium' ? 'bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700' : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700'} text-white font-bold text-sm py-3 px-6 rounded-full hover:scale-105 transition-all duration-300 ease-in-out transform shadow-lg hover:shadow-xl" data-doc="${jsonStr}">
+                            ${docStatus === 'premium' ? '🔒 Download' : '⬇️ Download'}
                           </button>
                         </div>
                       </div>
@@ -2815,7 +2874,8 @@ function updateUserInfo() {
           rejectedAt: data.rejectedAt,
           registeredAt: data.registeredAt,
           approvedBy: data.approvedBy,
-          rejectedBy: data.rejectedBy
+          rejectedBy: data.rejectedBy,
+          loginMethod: data.loginMethod
         }));
 
         const stats = { total: users.length, approved: 0, pending: 0, rejected: 0 };
@@ -2892,6 +2952,7 @@ function updateUserInfo() {
                     <p>Method: ${user.paymentMethod || 'N/A'}</p>
                     <p>Reference: ${user.paymentReference || 'N/A'}</p>
                     <p>Date: ${dateStr}</p>
+                    ${user.loginMethod ? `<p class="text-blue-600 font-semibold">Signup: ${user.loginMethod === 'google' ? 'Google Sign-In' : 'Email/Password'}</p>` : ''}
                   </div>
                 </div>
               </div>
@@ -3530,8 +3591,17 @@ function updateUserInfo() {
             if (viewDocBtn) {
               e.preventDefault();
               try {
-                const rawJson = viewDocBtn.dataset.doc.replace(/"/g, '"');
-                const docData = JSON.parse(rawJson);
+                // Decode HTML entities first, then parse JSON
+                const decodedJson = viewDocBtn.dataset.doc
+                  .replace(/&quot;/g, '"')
+                  .replace(/&amp;/g, '&')
+                  .replace(/&lt;/g, '<')
+                  .replace(/&gt;/g, '>');
+                const docData = JSON.parse(decodedJson);
+                // Normalize status field (handle Firebase object format)
+                if (docData.status && typeof docData.status === 'object' && docData.status.stringValue) {
+                  docData.status = docData.status.stringValue;
+                }
                 await handleViewDocument(docData);
               } catch (err) {
                 console.error('Error parsing or accessing document data:', err);
@@ -3542,8 +3612,17 @@ function updateUserInfo() {
             if (downloadDocBtn) {
               e.preventDefault();
               try {
-                const rawJson = downloadDocBtn.dataset.doc.replace(/"/g, '"');
-                const docData = JSON.parse(rawJson);
+                // Decode HTML entities first, then parse JSON
+                const decodedJson = downloadDocBtn.dataset.doc
+                  .replace(/&quot;/g, '"')
+                  .replace(/&amp;/g, '&')
+                  .replace(/&lt;/g, '<')
+                  .replace(/&gt;/g, '>');
+                const docData = JSON.parse(decodedJson);
+                // Normalize status field (handle Firebase object format)
+                if (docData.status && typeof docData.status === 'object' && docData.status.stringValue) {
+                  docData.status = docData.status.stringValue;
+                }
                 await handleDownloadDocument(docData);
               } catch (err) {
                 console.error('Error parsing or accessing document data:', err);
