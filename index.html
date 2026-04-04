@@ -33,6 +33,9 @@
   <link rel="canonical" href="https://studypedia-app.firebaseapp.com/">
   
 <title>Kampala School of Health Sciences Digital Library</title>
+  <style>
+    #preloader { position: fixed; inset: 0; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; font-family: sans-serif; z-index: 9999; }
+  </style>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts - Inter -->
@@ -281,6 +284,11 @@
     }
   </style>
 </head>
+
+<div id="preloader" class="flex flex-col items-center justify-center">
+    <div class="text-2xl font-bold mb-4">Loading...</div>
+    <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+  </div>
 
 <body class="bg-gray-50">
   <!-- Main App Container -->
@@ -3276,6 +3284,19 @@ async function loadAdminDashboard() {
 // Initialize App on load
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 Starting Studypedia Uganda application...');
+      
+      // Hide preloader function
+      const hidePreloader = () => {
+        const preloader = document.getElementById('preloader');
+        if (preloader) preloader.style.display = 'none';
+      };
+      
+      // Error handler - show error and hide preloader
+      window.addEventListener('error', (e) => {
+        console.error('Global error:', e.error);
+        hidePreloader();
+      });
+      
       try {
         console.log('🔧 Initializing Firebase...');
         const app = initializeApp(firebaseConfig);
@@ -3283,6 +3304,7 @@ async function loadAdminDashboard() {
         auth = getAuth(app);
         setLogLevel('debug');
         console.log('✅ Firebase initialized successfully');
+        hidePreloader();
 
         // Add event listener for upload button
         const uploadBtn = document.getElementById('upload-document-btn');
@@ -3383,6 +3405,7 @@ async function loadAdminDashboard() {
           auth = getAuth(app);
           setLogLevel('debug');
           console.log('✅ Firebase initialized successfully');
+          hidePreloader();
 
           // Initialize Firebase-dependent features
           cycleBgImages();
@@ -3390,6 +3413,7 @@ async function loadAdminDashboard() {
         } catch (firebaseError) {
           console.error('❌ Firebase initialization failed:', firebaseError);
           console.log('📝 Continuing with basic functionality without Firebase');
+          hidePreloader();
         }
 
         // Enhanced back button event listeners
@@ -3675,6 +3699,7 @@ async function loadAdminDashboard() {
 
       } catch (e) {
         console.error("❌ Firebase initialization failed:", e);
+        hidePreloader();
         mainContent.innerHTML = `<div class="p-8 bg-red-100 text-red-800 rounded-xl shadow-lg w-full"><h2 class="font-bold text-xl mb-2">Initialization Failed</h2><p>Could not initialize Firebase. Please check your configuration and network connection.</p><p>Error: ${e.message}</p></div>`;
       }
     });
