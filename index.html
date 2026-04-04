@@ -3652,12 +3652,11 @@ async function loadAdminDashboard() {
             } else if (e.target.id === 'contact-admin') {
               window.open('https://wa.me/0756454646', '_blank');
             } else if (e.target.id === 'logout-instead') {
-              if (confirm('Are you sure you want to logout instead of completing payment?')) {
+              if (confirm('Are you sure you want to logout?')) {
                 auth.signOut();
-                hidePaymentModal();
               }
             } else if (paymentForm && paymentForm.contains(e.target) && e.target.type === 'submit') {
-              handlePaymentSubmission(e);
+              // Payment form removed - no action needed
             } else if (e.target.id === 'view-pending-payments') {
               showPendingPaymentsPanel();
             } else if (e.target.id === 'view-approved-payments') {
