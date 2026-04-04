@@ -116,7 +116,6 @@
       /* All Modals - full screen on mobile */
       #login-modal > div,
       #register-modal > div,
-      #payment-modal > div,
       #contact-modal > div,
       #ai-chat-modal > div,
       #ai-response-modal > div {
@@ -130,14 +129,12 @@
       /* Modal text sizes */
       #login-modal .text-xl,
       #register-modal .text-xl,
-      #payment-modal .text-xl,
       #contact-modal .text-xl,
       #ai-chat-modal .text-xl {
         font-size: 1rem !important;
       }
       #login-modal .text-lg,
       #register-modal .text-lg,
-      #payment-modal .text-lg,
       #contact-modal .text-lg,
       #ai-chat-modal .text-lg {
         font-size: 0.875rem !important;
@@ -146,7 +143,6 @@
       /* Modal padding */
       #login-modal .p-6,
       #register-modal .p-6,
-      #payment-modal .p-6,
       #contact-modal .p-6,
       #ai-chat-modal .p-6,
       #ai-chat-modal .p-4 {
@@ -156,7 +152,6 @@
       /* Modal inputs */
       #login-modal input,
       #register-modal input,
-      #payment-modal input,
       #contact-modal input,
       #ai-chat-modal input {
         font-size: 0.875rem !important;
@@ -166,7 +161,6 @@
       /* Modal buttons */
       #login-modal button,
       #register-modal button,
-      #payment-modal button,
       #contact-modal button,
       #ai-chat-modal button {
         padding: 0.5rem 0.75rem !important;
@@ -619,28 +613,6 @@
     let currentLatestIndex = 0;
     let latestDocsInterval = null;
 
-    // Payment system variables
-    let paymentModalShown = false;
-    let paymentSubmitted = false;
-    let isSubmittingPayment = false;
-    
-    // Check if user can access premium content
-    async function canAccessPremium() {
-      // Admin always has access
-      if (user && user.email === ADMIN_EMAIL) {
-        return true;
-      }
-      
-      // Check if user has paid
-      try {
-        const paymentStatus = await checkPaymentStatus(user?.uid);
-        // Only allow access if user has paid
-        return paymentStatus.hasPaid === true;
-      } catch (error) {
-        console.error('Error checking premium access:', error);
-        return false;
-      }
-    }
 
     // Fetch documents with time: "latest" from all course units
     async function fetchLatestDocuments() {
@@ -685,11 +657,12 @@
       }
     }
 
-    // Render latest document card for homepage
+    // Render latest document card for homepage with thumbnail support
     function renderLatestDocumentCard(doc) {
       const displayTitle = doc.title || doc.id || 'Untitled Document';
       const filePath = doc.filePath || doc.filepath || doc['file path'] || null;
       const docStatus = (doc.status && typeof doc.status === 'object' && doc.status.stringValue) ? doc.status.stringValue : doc.status;
+      const thumbnail = doc.thumbnail || doc.thumb || doc.cover || null;
       
       if (!filePath) {
         return '';
@@ -704,10 +677,28 @@
         semesterId: doc.semesterId,
         unitId: doc.unitId
       };
-      const jsonStr = JSON.stringify(safeDoc).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      const jsonStr = JSON.stringify(safeDoc).replace(/&/g, '&').replace(/"/g, '"');
+      
+      // Thumbnail section
+      const thumbnailHTML = thumbnail ? `
+        <div class="flex-shrink-0 mb-3 sm:mb-0 sm:mr-4">
+          <div class="w-24 h-32 sm:w-32 sm:h-40 rounded-lg overflow-hidden shadow-md border border-gray-200">
+            <img src="${thumbnail}" alt="${displayTitle}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+          </div>
+        </div>
+      ` : `
+        <div class="flex-shrink-0 mb-3 sm:mb-0 sm:mr-4">
+          <div class="w-24 h-32 sm:w-32 sm:h-40 rounded-lg overflow-hidden shadow-md border border-gray-200 bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center">
+            <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+        </div>
+      `;
       
       return `
         <div class="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center transition-all duration-300 ease-in-out hover:shadow-xl hover:from-blue-50 hover:to-indigo-100 border border-blue-200 hover:border-blue-300">
+          ${thumbnailHTML}
           <div class="text-center sm:text-left mb-2 sm:mb-0 flex-1">
             <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
               <span class="font-semibold text-gray-800 text-lg">${displayTitle}</span>
@@ -781,57 +772,8 @@
       }
     }
 
-    // Show payment modal for premium content
-    function showPaymentForPremium() {
-      showPaymentModal();
-    }
-
-    // Document view tracking - show payment after 2 free views
+    // All content is now free - no payment required
     const ADMIN_EMAIL = 'kaigwaakram123@gmail.com';
-    const FREE_DOCUMENT_VIEWS = 3;
-    function getDocumentViewCount() {
-      return parseInt(localStorage.getItem('documentViewCount') || '0');
-    }
-    function incrementDocumentViewCount() {
-      const count = getDocumentViewCount() + 1;
-      localStorage.setItem('documentViewCount', count);
-      console.log('Document view count:', count);
-      return count;
-    }
-    async function checkAndShowPaymentModal() {
-      // Skip if user is admin
-      if (user && user.email === ADMIN_EMAIL) {
-        return false;
-      }
-      
-      // Skip if not logged in
-      if (!user || user.isAnonymous) {
-        return false;
-      }
-      
-      // Check if user already has payment approved
-      try {
-        const paymentStatus = await checkPaymentStatus(user.uid);
-        if (paymentStatus.hasPaid || paymentStatus.status === 'none') {
-          return false; // User has already paid
-        }
-      } catch (error) {
-        console.error('Error checking payment status:', error);
-      }
-      
-      const count = getDocumentViewCount();
-      console.log('Current document view count:', count, 'Threshold:', FREE_DOCUMENT_VIEWS);
-      
-      if (count >= FREE_DOCUMENT_VIEWS) {
-        // Show payment modal
-        if (!paymentModalShown) {
-          console.log('Showing payment modal after', count, 'document views');
-          showPaymentModal();
-        }
-        return true;
-      }
-      return false;
-    }
 
     // Debug variables
     let authStateChangeCount = 0;
@@ -1147,43 +1089,14 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }
-// Global access verification function
-async function verifyCourseAccess() {
-  if (!user || user.isAnonymous || user.email === ADMIN_EMAIL) {
-    return true; // Anonymous users and admin have access
-  }
-
-  try {
-    const paymentStatus = await checkPaymentStatus(user.uid);
-    return paymentStatus.hasPaid || paymentStatus.status === 'none';
-  } catch (error) {
-    console.error('Error verifying course access:', error);
-    return false;
-  }
-}
-
-// Auth functions
+// Auth functions - All users now have free access
 async function registerUser(email, password) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     console.log('User registered:', userCredential.user);
 
-    // Initialize payment status for new user
-    await setDoc(doc(db, 'user_payments', userCredential.user.uid), {
-      userId: userCredential.user.uid,
-      userEmail: email,
-      status: 'pending',
-      amount: 5000,
-      registeredAt: new Date(),
-      isNewUser: true,
-      loginMethod: 'email'
-    });
-
     alert('Registration successful! Welcome to Studypedia Uganda.');
     hideModal(registerModal);
-
-    // Don't show payment modal immediately - let user browse first
-    // Payment will be requested after viewing 2 documents
     console.log('User registered successfully');
 
     return userCredential.user;
@@ -1199,45 +1112,18 @@ async function loginUser(email, password) {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     console.log('✅ User logged in successfully:', userCredential.user.uid);
 
-    // Check if user is new or existing
-    console.log('🔍 Checking payment status...');
-    const paymentStatus = await checkPaymentStatus(userCredential.user.uid);
-    console.log('💳 Payment status:', paymentStatus);
+    // Update UI immediately
+    updateAuthUI(true, userCredential.user);
+    updateUserInfo();
 
-    if (paymentStatus.hasPaid || paymentStatus.status === 'none') {
-      // Existing user with approved payment or no payment record (legacy user)
-      console.log('✅ Existing user has access, redirecting to homepage');
+    alert('Login successful! Welcome back.');
+    hideModal(loginModal);
 
-      // Update UI immediately
-      updateAuthUI(true, userCredential.user);
-      updateUserInfo();
-
-      alert('Login successful! Welcome back.');
-      hideModal(loginModal);
-
-      // Redirect to homepage for existing users
-      setTimeout(() => {
-        goToPage('home');
-        console.log('🔄 Redirected existing user to homepage');
-      }, 500);
-    } else {
-      // User with pending payment - don't block, let them browse
-      // Payment will be requested after viewing 2 documents
-      console.log('⏳ User has pending payment, allowing browse - payment will be requested after 2 documents');
-
-      // Update UI immediately for new users too
-      updateAuthUI(true, userCredential.user);
-      updateUserInfo();
-
-      alert('Login successful! Welcome back.');
-      hideModal(loginModal);
-
-      // Redirect to homepage
-      setTimeout(() => {
-        goToPage('home');
-        console.log('🔄 Redirected user to homepage');
-      }, 500);
-    }
+    // Redirect to homepage
+    setTimeout(() => {
+      goToPage('home');
+      console.log('🔄 Redirected user to homepage');
+    }, 500);
 
     return userCredential.user;
   } catch (error) {
@@ -1256,39 +1142,14 @@ async function signInWithGoogle(isRegister = false) {
     const user = result.user;
     console.log('✅ Google Sign-In successful:', user.uid);
     
-    // Check if this is a new user by checking payment status
-    const paymentStatus = await checkPaymentStatus(user.uid);
-    console.log('💳 Payment status:', paymentStatus);
-    
-    // Initialize payment record if new user
-    if (!paymentStatus.hasPaid && paymentStatus.status === 'none') {
-      await setDoc(doc(db, 'user_payments', user.uid), {
-        userId: user.uid,
-        userEmail: user.email,
-        status: 'pending',
-        amount: 5000,
-        registeredAt: new Date(),
-        isNewUser: true,
-        loginMethod: 'google'
-      });
-    }
-    
     // Update UI
     updateAuthUI(true, user);
     updateUserInfo();
     
-    if (paymentStatus.hasPaid || paymentStatus.status === 'none') {
-      alert('Login successful! Welcome back.');
-      hideModal(loginModal);
-      hideModal(registerModal);
-      goToPage('home');
-    } else {
-      // New Google user - let them browse, payment will be requested after 2 documents
-      alert('Login successful! Welcome to Studypedia Uganda.');
-      hideModal(loginModal);
-      hideModal(registerModal);
-      goToPage('home');
-    }
+    alert('Login successful! Welcome to Studypedia Uganda.');
+    hideModal(loginModal);
+    hideModal(registerModal);
+    goToPage('home');
     
     return user;
   } catch (error) {
@@ -1399,280 +1260,6 @@ function updateUserInfo() {
       document.body.style.overflow = '';
     }
 
-    // Payment modal functions
-    function showPaymentModal() {
-      console.log('🪟 showPaymentModal() called, paymentModalShown:', paymentModalShown);
-
-      // Prevent showing modal multiple times
-      if (paymentModalShown) {
-        console.log('⚠️ Payment modal already shown, ignoring duplicate call');
-        return;
-      }
-
-      paymentModalShown = true;
-      showModal(paymentModal);
-      console.log('✅ Payment modal displayed');
-    }
-
-    function hidePaymentModal() {
-      console.log('🔒 hidePaymentModal() called');
-      paymentModalShown = false;
-      hideModal(paymentModal);
-      // Reset submission flag when modal is closed
-      isSubmittingPayment = false;
-      console.log('✅ Payment modal hidden');
-    }
-
-    // Pesapal Payment Integration
-    // Note: Replace with your actual Pesapal credentials
-    const PESAPAL_CONSUMER_KEY = 'your_pesapal_consumer_key';
-    const PESAPAL_CONSUMER_SECRET = 'your_pesapal_consumer_secret';
-    const PESAPAL_API_URL = 'https://pay.pesapal.com/API/PostPaymentOrder';
-    const PESAPAL_IFRAME_URL = 'https://pay.pesapal.com/ipg/ipgframe';
-    
-    async function initiatePesapalPayment() {
-      const phoneInput = document.getElementById('payment-phone');
-      const phone = phoneInput?.value.trim();
-      
-      // Get selected plan
-      const planInputs = document.getElementsByName('subscription-plan');
-      let selectedPlan = 'monthly';
-      for (const input of planInputs) {
-        if (input.checked) {
-          selectedPlan = input.value;
-          break;
-        }
-      }
-      
-      // Get selected network
-      const networkInputs = document.getElementsByName('payment-network');
-      let selectedNetwork = 'MTN';
-      for (const input of networkInputs) {
-        if (input.checked) {
-          selectedNetwork = input.value;
-          break;
-        }
-      }
-      
-      const amount = selectedPlan === 'monthly' ? 5000 : 100000;
-      const planName = selectedPlan === 'monthly' ? 'Monthly Subscription' : 'Annual Subscription';
-      
-      if (!phone) {
-        alert('Please enter your phone number');
-        return;
-      }
-      
-      // Validate phone format (Uganda format)
-      const phoneRegex = /^256[37][0-9]{8}$/;
-      let formattedPhone = phone.replace(/\s/g, '');
-      if (formattedPhone.startsWith('0')) {
-        formattedPhone = '256' + formattedPhone.substring(1);
-      } else if (formattedPhone.startsWith('+256')) {
-        formattedPhone = formattedPhone.substring(1);
-      } else if (!formattedPhone.startsWith('256')) {
-        formattedPhone = '256' + formattedPhone;
-      }
-      
-      if (!phoneRegex.test(formattedPhone)) {
-        alert('Please enter a valid Uganda phone number (e.g., 256752123456)');
-        return;
-      }
-      
-      const payBtn = document.getElementById('pesapal-pay-btn');
-      payBtn.disabled = true;
-      payBtn.textContent = 'Processing...';
-      
-      try {
-        // Call backend to create Pesapal order
-        const response = await fetch(`${API_BASE_URL}/api/pesapal/create-order`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            amount: amount,
-            description: `Studypedia Uganda - ${planName}`,
-            phone: formattedPhone,
-            network: selectedNetwork,
-            plan: selectedPlan,
-            email: user?.email || 'user@studypedia.ug',
-            userId: user?.uid
-          })
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to create payment order');
-        }
-        
-        const data = await response.json();
-        
-        if (data.status === 'success' && data.order_tracking_id) {
-          // Show Pesapal iframe for payment
-          showPesapalIframe(data.order_tracking_id, data.redirect_url);
-        } else {
-          throw new Error(data.message || 'Payment initialization failed');
-        }
-      } catch (error) {
-        console.error('❌ Pesapal payment error:', error);
-        alert('Payment failed: ' + error.message + '. Please try again or contact admin.');
-        payBtn.disabled = false;
-        payBtn.textContent = 'Pay with Mobile Money';
-      }
-    }
-    
-    function showPesapalIframe(orderTrackingId, redirectUrl) {
-      // Create modal for Pesapal iframe
-      const iframeModal = document.createElement('div');
-      iframeModal.id = 'pesapal-iframe-modal';
-      iframeModal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50';
-      iframeModal.innerHTML = `
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 overflow-hidden">
-          <div class="bg-gradient-to-r from-yellow-500 to-orange-500 p-4">
-            <h3 class="text-white font-bold text-lg">Complete Payment</h3>
-            <p class="text-white text-sm">Follow the prompts on your phone</p>
-          </div>
-          <div class="p-4">
-            <iframe id="pesapal-iframe" src="${redirectUrl}" width="100%" height="500" frameborder="0"></iframe>
-          </div>
-          <div class="p-4 bg-gray-50 flex justify-between">
-            <button onclick="checkPesapalStatus('${orderTrackingId}')" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
-              Check Payment Status
-            </button>
-            <button onclick="closePesapalIframe()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
-              Cancel
-            </button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(iframeModal);
-      
-      // Listen for messages from Pesapal iframe
-      window.addEventListener('message', function(e) {
-        if (e.data === 'payment_complete' || e.data === 'payment_failed') {
-          checkPesapalStatus(orderTrackingId);
-        }
-      });
-    }
-    
-    async function checkPesapalStatus(orderTrackingId) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/pesapal/status/${orderTrackingId}`);
-        const data = await response.json();
-        
-        if (data.status === 'COMPLETED' || data.payment_status === 'completed') {
-          alert('Payment successful! Your subscription is now active.');
-          closePesapalIframe();
-          hidePaymentModal();
-          
-          // Update user payment status
-          if (user) {
-            await setDoc(doc(db, 'user_payments', user.uid), {
-              status: 'approved',
-              paymentStatus: 'completed',
-              pesapalOrderId: orderTrackingId,
-              approvedAt: new Date(),
-              plan: data.plan || 'monthly',
-              amount: data.amount
-            }, { merge: true });
-            
-            // Refresh page to update access
-            window.location.reload();
-          }
-        } else if (data.status === 'PENDING' || data.payment_status === 'pending') {
-          alert('Payment is still pending. Please complete the payment on your phone.');
-        } else {
-          alert('Payment not completed. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error checking payment status:', error);
-        alert('Error checking payment status. Please contact admin.');
-      }
-    }
-    
-    function closePesapalIframe() {
-      const iframeModal = document.getElementById('pesapal-iframe-modal');
-      if (iframeModal) {
-        iframeModal.remove();
-      }
-      const payBtn = document.getElementById('pesapal-pay-btn');
-      if (payBtn) {
-        payBtn.disabled = false;
-        payBtn.textContent = 'Pay with Mobile Money';
-      }
-    }
-    
-    // Make functions globally accessible
-    window.initiatePesapalPayment = initiatePesapalPayment;
-    window.checkPesapalStatus = checkPesapalStatus;
-    window.hidePaymentModal = hidePaymentModal;
-    window.closePesapalIframe = closePesapalIframe;
-
-    // Check if user has paid and been approved (via backend)
-    async function checkPaymentStatus(userId) {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/payments/status/${userId}`);
-        if (!response.ok) throw new Error('Server error checking payment status');
-        return await response.json();
-      } catch (error) {
-        console.error('Error checking payment status:', error);
-        return { hasPaid: false, status: 'error', isNewUser: false };
-      }
-    }
-
-    // Submit payment details (via backend)
-    async function submitPaymentDetails(reference, method) {
-      if (isSubmittingPayment) {
-        console.log('⚠️ Payment submission already in progress');
-        return;
-      }
-
-      isSubmittingPayment = true;
-      console.log('🔄 Starting payment submission...');
-
-      try {
-        const currentUser = auth.currentUser;
-        if (!currentUser || currentUser.isAnonymous) {
-          throw new Error('User not authenticated. Please log in again.');
-        }
-        if (!currentUser.uid || !currentUser.email) {
-          throw new Error('User ID or email is missing. Please log in again.');
-        }
-        if (!reference || reference.trim().length < 3) {
-          throw new Error('Please enter a valid payment reference (at least 3 characters)');
-        }
-        if (!method) {
-          throw new Error('Please select a payment method');
-        }
-
-        const response = await fetch(`${API_BASE_URL}/api/payments/submit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId: currentUser.uid,
-            userEmail: currentUser.email,
-            paymentReference: reference,
-            paymentMethod: method
-          })
-        });
-
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || 'Server error submitting payment');
-        }
-
-        const submitBtn = document.getElementById('payment-submit-btn');
-        if (submitBtn) submitBtn.textContent = 'Submit Payment Details';
-        console.log('✅ Payment submitted via backend');
-        return true;
-      } catch (error) {
-        console.error('❌ Error submitting payment:', error);
-        const submitBtn = document.getElementById('payment-submit-btn');
-        if (submitBtn) submitBtn.textContent = 'Submit Payment Details';
-        throw error;
-      } finally {
-        isSubmittingPayment = false;
-      }
-    }
 
 
     // Medical student background images - rotating every 30 seconds
@@ -2502,11 +2089,11 @@ function updateUserInfo() {
                             </div>
 
                             <!-- Admin Stats Cards -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                               <div class="bg-white p-6 rounded-xl shadow-lg border border-purple-200">
                                 <div class="flex items-center justify-between">
                                   <div>
-                                    <p class="text-sm font-medium text-gray-600">Total Users</p>
+                                    <p class="text-sm font-medium text-gray-600">Total Registered Users</p>
                                     <p id="total-users" class="text-3xl font-bold text-purple-600">--</p>
                                   </div>
                                   <div class="bg-purple-100 p-3 rounded-full">
@@ -2517,43 +2104,15 @@ function updateUserInfo() {
                                 </div>
                               </div>
 
-                              <div class="bg-white p-6 rounded-xl shadow-lg border border-green-200">
+                              <div class="bg-white p-6 rounded-xl shadow-lg border border-blue-200">
                                 <div class="flex items-center justify-between">
                                   <div>
-                                    <p class="text-sm font-medium text-gray-600">Approved Users</p>
-                                    <p id="approved-users" class="text-3xl font-bold text-green-600">--</p>
+                                    <p class="text-sm font-medium text-gray-600">Active Users</p>
+                                    <p id="active-users" class="text-3xl font-bold text-blue-600">--</p>
                                   </div>
-                                  <div class="bg-green-100 p-3 rounded-full">
-                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <div class="bg-blue-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div class="bg-white p-6 rounded-xl shadow-lg border border-yellow-200">
-                                <div class="flex items-center justify-between">
-                                  <div>
-                                    <p class="text-sm font-medium text-gray-600">Pending Users</p>
-                                    <p id="pending-users" class="text-3xl font-bold text-yellow-600">--</p>
-                                  </div>
-                                  <div class="bg-yellow-100 p-3 rounded-full">
-                                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div class="bg-white p-6 rounded-xl shadow-lg border border-red-200">
-                                <div class="flex items-center justify-between">
-                                  <div>
-                                    <p class="text-sm font-medium text-gray-600">Rejected Users</p>
-                                    <p id="rejected-users" class="text-3xl font-bold text-red-600">--</p>
-                                  </div>
-                                  <div class="bg-red-100 p-3 rounded-full">
-                                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                   </div>
                                 </div>
@@ -3175,12 +2734,6 @@ function updateUserInfo() {
             </svg>
             <span>Admin Panel</span>
           </div>
-          <button id="view-pending-payments" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded mb-2 transition-colors">
-            Pending Payments (${getPendingPaymentsCount()})
-          </button>
-          <button id="view-approved-payments" class="w-full bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-2 rounded transition-colors">
-            Approved Users
-          </button>
         `;
       }
     }
