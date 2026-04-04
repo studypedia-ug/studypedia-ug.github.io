@@ -32,10 +32,7 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="https://studypedia-app.firebaseapp.com/">
   
-<title>Kampala School of Health Sciences Digital Library</title>
-  <style>
-    #preloader { position: fixed; inset: 0; background: #2563eb; display: flex; align-items: center; justify-content: center; color: white; font-family: sans-serif; z-index: 9999; }
-  </style>
+  <title>Studypedia Uganda</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts - Inter -->
@@ -119,6 +116,7 @@
       /* All Modals - full screen on mobile */
       #login-modal > div,
       #register-modal > div,
+      #payment-modal > div,
       #contact-modal > div,
       #ai-chat-modal > div,
       #ai-response-modal > div {
@@ -132,12 +130,14 @@
       /* Modal text sizes */
       #login-modal .text-xl,
       #register-modal .text-xl,
+      #payment-modal .text-xl,
       #contact-modal .text-xl,
       #ai-chat-modal .text-xl {
         font-size: 1rem !important;
       }
       #login-modal .text-lg,
       #register-modal .text-lg,
+      #payment-modal .text-lg,
       #contact-modal .text-lg,
       #ai-chat-modal .text-lg {
         font-size: 0.875rem !important;
@@ -146,6 +146,7 @@
       /* Modal padding */
       #login-modal .p-6,
       #register-modal .p-6,
+      #payment-modal .p-6,
       #contact-modal .p-6,
       #ai-chat-modal .p-6,
       #ai-chat-modal .p-4 {
@@ -155,6 +156,7 @@
       /* Modal inputs */
       #login-modal input,
       #register-modal input,
+      #payment-modal input,
       #contact-modal input,
       #ai-chat-modal input {
         font-size: 0.875rem !important;
@@ -164,6 +166,7 @@
       /* Modal buttons */
       #login-modal button,
       #register-modal button,
+      #payment-modal button,
       #contact-modal button,
       #ai-chat-modal button {
         padding: 0.5rem 0.75rem !important;
@@ -284,11 +287,6 @@
     }
   </style>
 </head>
-
-<div id="preloader" class="flex flex-col items-center justify-center">
-    <div class="text-2xl font-bold mb-4">Loading...</div>
-    <div class="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
-  </div>
 
 <body class="bg-gray-50">
   <!-- Main App Container -->
@@ -534,6 +532,93 @@
       </div>
     </div>
 
+    <!-- Payment Prompt Modal -->
+    <div id="payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" onclick="if(event.target === this) hidePaymentModal()">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 relative">
+        <button id="close-payment-modal" class="absolute top-3 right-3 text-white bg-red-500 hover:bg-red-600 rounded-full p-3 w-12 h-12 flex items-center justify-center z-10 shadow-lg" title="Close">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+        <div class="p-6 pt-10">
+          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <svg class="w-6 h-6 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Subscription Plans
+          </h3>
+          
+          <!-- Subscription Plans -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select Plan</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="subscription-plan" value="monthly" class="peer sr-only" checked>
+                <div class="p-3 border-2 border-blue-500 rounded-lg bg-blue-50 peer-checked:bg-blue-500 peer-checked:text-white transition-all">
+                  <p class="font-bold">Monthly</p>
+                  <p class="text-sm">UGX 5,000/month</p>
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="subscription-plan" value="annual" class="peer sr-only">
+                <div class="p-3 border-2 border-green-500 rounded-lg hover:bg-green-50 transition-all">
+                  <p class="font-bold">Annual</p>
+                  <p class="text-sm">UGX 100,000/year</p>
+                  <p class="text-xs text-green-600 font-semibold">Save 40%</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <p class="text-gray-700 mb-2">Pay via Mobile Money (Pesapal)</p>
+            <p class="text-sm text-gray-600 mb-3">Payment will be processed securely through Pesapal. You'll receive a prompt on your phone to confirm.</p>
+            
+            <!-- Payment Method Selection -->
+            <div class="mb-3">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Network</label>
+              <div class="grid grid-cols-2 gap-2">
+                <label class="cursor-pointer">
+                  <input type="radio" name="payment-network" value="MTN" class="peer sr-only" checked>
+                  <div class="p-2 border-2 border-yellow-500 rounded bg-yellow-100 peer-checked:bg-yellow-500 peer-checked:text-white text-center transition-all">
+                    <span class="font-bold">MTN</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="payment-network" value="AIRTEL" class="peer sr-only">
+                  <div class="p-2 border-2 border-red-500 rounded hover:bg-red-50 text-center transition-all">
+                    <span class="font-bold text-red-600">Airtel</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="bg-white rounded p-3 border border-yellow-300">
+              <p class="text-sm font-medium text-gray-800">Phone Number for Payment</p>
+              <input type="tel" id="payment-phone" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 256752123456">
+              <p class="text-xs text-gray-500 mt-1">Enter your mobile money phone number</p>
+            </div>
+          </div>
+          
+          <button type="button" id="pesapal-pay-btn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-3 px-4 rounded-md transition-colors font-bold" onclick="initiatePesapalPayment()">
+            Pay with Mobile Money
+          </button>
+          
+          <button type="button" id="browse-free-btn" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md transition-colors font-semibold" onclick="hidePaymentModal()">
+            Continue Browsing for Free
+          </button>
+          
+          <p class="mt-3 text-center text-xs text-gray-500">
+            Secured by Pesapal. Payment processed securely.
+          </p>
+          
+          <p class="mt-4 text-center text-sm text-gray-600">
+            <button id="contact-admin" class="text-blue-500 hover:underline">Contact Admin</button> |
+            <button id="logout-instead" class="text-red-500 hover:underline">Logout Instead</button>
+          </p>
+        </div>
+      </div>
+    </div>
 
     <!-- Contact Us Modal -->
     <div id="contact-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
@@ -621,39 +706,51 @@
     let currentLatestIndex = 0;
     let latestDocsInterval = null;
 
+    // Payment system variables
+    let paymentModalShown = false;
+    let paymentSubmitted = false;
+    let isSubmittingPayment = false;
+    
+    // Check if user can access premium content
+    async function canAccessPremium() {
+      // Admin always has access
+      if (user && user.email === ADMIN_EMAIL) {
+        return true;
+      }
+      
+      // Check if user has paid
+      try {
+        const paymentStatus = await checkPaymentStatus(user?.uid);
+        // Only allow access if user has paid
+        return paymentStatus.hasPaid === true;
+      } catch (error) {
+        console.error('Error checking premium access:', error);
+        return false;
+      }
+    }
 
     // Fetch documents with time: "latest" from all course units
     async function fetchLatestDocuments() {
       try {
-        const allDocsQuery = query(collectionGroup(db, 'documents'));
+        const allDocsQuery = query(collectionGroup(db, 'documents'), where('time', '==', 'latest'));
         const snapshot = await getDocs(allDocsQuery);
         
         const docs = [];
         for (const doc of snapshot.docs) {
           const data = doc.data();
-          // Check for time: "latest" only
-          const docTime = (data.time && typeof data.time === 'object' && data.time.stringValue) ? data.time.stringValue : data.time;
+          // Get the full path to find course info
+          const pathParts = doc.ref.path.split('/');
+          const courseId = pathParts[1];
+          const semesterId = pathParts[3];
+          const unitId = pathParts[5];
           
-          if (docTime === 'latest') {
-            // Get the full path to find course info
-            const pathParts = doc.ref.path.split('/');
-            const courseId = pathParts[1];
-            const semesterId = pathParts[3];
-            const unitId = pathParts[5];
-            
-            // Get status field separately (for premium/free marking)
-            const docStatus = (data.status && typeof data.status === 'object' && data.status.stringValue) ? data.status.stringValue : data.status;
-            
-            docs.push({
-              id: doc.id,
-              ...data,
-              courseId,
-              semesterId,
-              unitId,
-              status: docStatus,
-              time: docTime
-            });
-          }
+          docs.push({
+            id: doc.id,
+            ...data,
+            courseId,
+            semesterId,
+            unitId
+          });
         }
         
         console.log('Latest documents found:', docs.length);
@@ -665,12 +762,11 @@
       }
     }
 
-    // Render latest document card for homepage with thumbnail support
+    // Render latest document card for homepage
     function renderLatestDocumentCard(doc) {
       const displayTitle = doc.title || doc.id || 'Untitled Document';
       const filePath = doc.filePath || doc.filepath || doc['file path'] || null;
       const docStatus = (doc.status && typeof doc.status === 'object' && doc.status.stringValue) ? doc.status.stringValue : doc.status;
-      const thumbnail = doc.thumbnail || doc.thumb || doc.cover || null;
       
       if (!filePath) {
         return '';
@@ -685,28 +781,10 @@
         semesterId: doc.semesterId,
         unitId: doc.unitId
       };
-      const jsonStr = JSON.stringify(safeDoc).replace(/&/g, '&').replace(/"/g, '"');
-      
-      // Thumbnail section
-      const thumbnailHTML = thumbnail ? `
-        <div class="flex-shrink-0 mb-3 sm:mb-0 sm:mr-4">
-          <div class="w-24 h-32 sm:w-32 sm:h-40 rounded-lg overflow-hidden shadow-md border border-gray-200">
-            <img src="${thumbnail}" alt="${displayTitle}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-          </div>
-        </div>
-      ` : `
-        <div class="flex-shrink-0 mb-3 sm:mb-0 sm:mr-4">
-          <div class="w-24 h-32 sm:w-32 sm:h-40 rounded-lg overflow-hidden shadow-md border border-gray-200 bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center">
-            <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </div>
-        </div>
-      `;
+      const jsonStr = JSON.stringify(safeDoc).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
       
       return `
         <div class="bg-gradient-to-br from-white to-blue-50 p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center transition-all duration-300 ease-in-out hover:shadow-xl hover:from-blue-50 hover:to-indigo-100 border border-blue-200 hover:border-blue-300">
-          ${thumbnailHTML}
           <div class="text-center sm:text-left mb-2 sm:mb-0 flex-1">
             <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
               <span class="font-semibold text-gray-800 text-lg">${displayTitle}</span>
@@ -780,8 +858,57 @@
       }
     }
 
-    // All content is now free - no payment required
+    // Show payment modal for premium content
+    function showPaymentForPremium() {
+      showPaymentModal();
+    }
+
+    // Document view tracking - show payment after 2 free views
     const ADMIN_EMAIL = 'kaigwaakram123@gmail.com';
+    const FREE_DOCUMENT_VIEWS = 3;
+    function getDocumentViewCount() {
+      return parseInt(localStorage.getItem('documentViewCount') || '0');
+    }
+    function incrementDocumentViewCount() {
+      const count = getDocumentViewCount() + 1;
+      localStorage.setItem('documentViewCount', count);
+      console.log('Document view count:', count);
+      return count;
+    }
+    async function checkAndShowPaymentModal() {
+      // Skip if user is admin
+      if (user && user.email === ADMIN_EMAIL) {
+        return false;
+      }
+      
+      // Skip if not logged in
+      if (!user || user.isAnonymous) {
+        return false;
+      }
+      
+      // Check if user already has payment approved
+      try {
+        const paymentStatus = await checkPaymentStatus(user.uid);
+        if (paymentStatus.hasPaid || paymentStatus.status === 'none') {
+          return false; // User has already paid
+        }
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+      }
+      
+      const count = getDocumentViewCount();
+      console.log('Current document view count:', count, 'Threshold:', FREE_DOCUMENT_VIEWS);
+      
+      if (count >= FREE_DOCUMENT_VIEWS) {
+        // Show payment modal
+        if (!paymentModalShown) {
+          console.log('Showing payment modal after', count, 'document views');
+          showPaymentModal();
+        }
+        return true;
+      }
+      return false;
+    }
 
     // Debug variables
     let authStateChangeCount = 0;
@@ -1097,14 +1224,43 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
     }
-// Auth functions - All users now have free access
+// Global access verification function
+async function verifyCourseAccess() {
+  if (!user || user.isAnonymous || user.email === ADMIN_EMAIL) {
+    return true; // Anonymous users and admin have access
+  }
+
+  try {
+    const paymentStatus = await checkPaymentStatus(user.uid);
+    return paymentStatus.hasPaid || paymentStatus.status === 'none';
+  } catch (error) {
+    console.error('Error verifying course access:', error);
+    return false;
+  }
+}
+
+// Auth functions
 async function registerUser(email, password) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     console.log('User registered:', userCredential.user);
 
+    // Initialize payment status for new user
+    await setDoc(doc(db, 'user_payments', userCredential.user.uid), {
+      userId: userCredential.user.uid,
+      userEmail: email,
+      status: 'pending',
+      amount: 5000,
+      registeredAt: new Date(),
+      isNewUser: true,
+      loginMethod: 'email'
+    });
+
     alert('Registration successful! Welcome to Studypedia Uganda.');
     hideModal(registerModal);
+
+    // Don't show payment modal immediately - let user browse first
+    // Payment will be requested after viewing 2 documents
     console.log('User registered successfully');
 
     return userCredential.user;
@@ -1120,18 +1276,45 @@ async function loginUser(email, password) {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     console.log('✅ User logged in successfully:', userCredential.user.uid);
 
-    // Update UI immediately
-    updateAuthUI(true, userCredential.user);
-    updateUserInfo();
+    // Check if user is new or existing
+    console.log('🔍 Checking payment status...');
+    const paymentStatus = await checkPaymentStatus(userCredential.user.uid);
+    console.log('💳 Payment status:', paymentStatus);
 
-    alert('Login successful! Welcome back.');
-    hideModal(loginModal);
+    if (paymentStatus.hasPaid || paymentStatus.status === 'none') {
+      // Existing user with approved payment or no payment record (legacy user)
+      console.log('✅ Existing user has access, redirecting to homepage');
 
-    // Redirect to homepage
-    setTimeout(() => {
-      goToPage('home');
-      console.log('🔄 Redirected user to homepage');
-    }, 500);
+      // Update UI immediately
+      updateAuthUI(true, userCredential.user);
+      updateUserInfo();
+
+      alert('Login successful! Welcome back.');
+      hideModal(loginModal);
+
+      // Redirect to homepage for existing users
+      setTimeout(() => {
+        goToPage('home');
+        console.log('🔄 Redirected existing user to homepage');
+      }, 500);
+    } else {
+      // User with pending payment - don't block, let them browse
+      // Payment will be requested after viewing 2 documents
+      console.log('⏳ User has pending payment, allowing browse - payment will be requested after 2 documents');
+
+      // Update UI immediately for new users too
+      updateAuthUI(true, userCredential.user);
+      updateUserInfo();
+
+      alert('Login successful! Welcome back.');
+      hideModal(loginModal);
+
+      // Redirect to homepage
+      setTimeout(() => {
+        goToPage('home');
+        console.log('🔄 Redirected user to homepage');
+      }, 500);
+    }
 
     return userCredential.user;
   } catch (error) {
@@ -1150,14 +1333,39 @@ async function signInWithGoogle(isRegister = false) {
     const user = result.user;
     console.log('✅ Google Sign-In successful:', user.uid);
     
+    // Check if this is a new user by checking payment status
+    const paymentStatus = await checkPaymentStatus(user.uid);
+    console.log('💳 Payment status:', paymentStatus);
+    
+    // Initialize payment record if new user
+    if (!paymentStatus.hasPaid && paymentStatus.status === 'none') {
+      await setDoc(doc(db, 'user_payments', user.uid), {
+        userId: user.uid,
+        userEmail: user.email,
+        status: 'pending',
+        amount: 5000,
+        registeredAt: new Date(),
+        isNewUser: true,
+        loginMethod: 'google'
+      });
+    }
+    
     // Update UI
     updateAuthUI(true, user);
     updateUserInfo();
     
-    alert('Login successful! Welcome to Studypedia Uganda.');
-    hideModal(loginModal);
-    hideModal(registerModal);
-    goToPage('home');
+    if (paymentStatus.hasPaid || paymentStatus.status === 'none') {
+      alert('Login successful! Welcome back.');
+      hideModal(loginModal);
+      hideModal(registerModal);
+      goToPage('home');
+    } else {
+      // New Google user - let them browse, payment will be requested after 2 documents
+      alert('Login successful! Welcome to Studypedia Uganda.');
+      hideModal(loginModal);
+      hideModal(registerModal);
+      goToPage('home');
+    }
     
     return user;
   } catch (error) {
@@ -1268,6 +1476,280 @@ function updateUserInfo() {
       document.body.style.overflow = '';
     }
 
+    // Payment modal functions
+    function showPaymentModal() {
+      console.log('🪟 showPaymentModal() called, paymentModalShown:', paymentModalShown);
+
+      // Prevent showing modal multiple times
+      if (paymentModalShown) {
+        console.log('⚠️ Payment modal already shown, ignoring duplicate call');
+        return;
+      }
+
+      paymentModalShown = true;
+      showModal(paymentModal);
+      console.log('✅ Payment modal displayed');
+    }
+
+    function hidePaymentModal() {
+      console.log('🔒 hidePaymentModal() called');
+      paymentModalShown = false;
+      hideModal(paymentModal);
+      // Reset submission flag when modal is closed
+      isSubmittingPayment = false;
+      console.log('✅ Payment modal hidden');
+    }
+
+    // Pesapal Payment Integration
+    // Note: Replace with your actual Pesapal credentials
+    const PESAPAL_CONSUMER_KEY = 'your_pesapal_consumer_key';
+    const PESAPAL_CONSUMER_SECRET = 'your_pesapal_consumer_secret';
+    const PESAPAL_API_URL = 'https://pay.pesapal.com/API/PostPaymentOrder';
+    const PESAPAL_IFRAME_URL = 'https://pay.pesapal.com/ipg/ipgframe';
+    
+    async function initiatePesapalPayment() {
+      const phoneInput = document.getElementById('payment-phone');
+      const phone = phoneInput?.value.trim();
+      
+      // Get selected plan
+      const planInputs = document.getElementsByName('subscription-plan');
+      let selectedPlan = 'monthly';
+      for (const input of planInputs) {
+        if (input.checked) {
+          selectedPlan = input.value;
+          break;
+        }
+      }
+      
+      // Get selected network
+      const networkInputs = document.getElementsByName('payment-network');
+      let selectedNetwork = 'MTN';
+      for (const input of networkInputs) {
+        if (input.checked) {
+          selectedNetwork = input.value;
+          break;
+        }
+      }
+      
+      const amount = selectedPlan === 'monthly' ? 5000 : 100000;
+      const planName = selectedPlan === 'monthly' ? 'Monthly Subscription' : 'Annual Subscription';
+      
+      if (!phone) {
+        alert('Please enter your phone number');
+        return;
+      }
+      
+      // Validate phone format (Uganda format)
+      const phoneRegex = /^256[37][0-9]{8}$/;
+      let formattedPhone = phone.replace(/\s/g, '');
+      if (formattedPhone.startsWith('0')) {
+        formattedPhone = '256' + formattedPhone.substring(1);
+      } else if (formattedPhone.startsWith('+256')) {
+        formattedPhone = formattedPhone.substring(1);
+      } else if (!formattedPhone.startsWith('256')) {
+        formattedPhone = '256' + formattedPhone;
+      }
+      
+      if (!phoneRegex.test(formattedPhone)) {
+        alert('Please enter a valid Uganda phone number (e.g., 256752123456)');
+        return;
+      }
+      
+      const payBtn = document.getElementById('pesapal-pay-btn');
+      payBtn.disabled = true;
+      payBtn.textContent = 'Processing...';
+      
+      try {
+        // Call backend to create Pesapal order
+        const response = await fetch(`${API_BASE_URL}/api/pesapal/create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            amount: amount,
+            description: `Studypedia Uganda - ${planName}`,
+            phone: formattedPhone,
+            network: selectedNetwork,
+            plan: selectedPlan,
+            email: user?.email || 'user@studypedia.ug',
+            userId: user?.uid
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to create payment order');
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success' && data.order_tracking_id) {
+          // Show Pesapal iframe for payment
+          showPesapalIframe(data.order_tracking_id, data.redirect_url);
+        } else {
+          throw new Error(data.message || 'Payment initialization failed');
+        }
+      } catch (error) {
+        console.error('❌ Pesapal payment error:', error);
+        alert('Payment failed: ' + error.message + '. Please try again or contact admin.');
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay with Mobile Money';
+      }
+    }
+    
+    function showPesapalIframe(orderTrackingId, redirectUrl) {
+      // Create modal for Pesapal iframe
+      const iframeModal = document.createElement('div');
+      iframeModal.id = 'pesapal-iframe-modal';
+      iframeModal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-50';
+      iframeModal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 overflow-hidden">
+          <div class="bg-gradient-to-r from-yellow-500 to-orange-500 p-4">
+            <h3 class="text-white font-bold text-lg">Complete Payment</h3>
+            <p class="text-white text-sm">Follow the prompts on your phone</p>
+          </div>
+          <div class="p-4">
+            <iframe id="pesapal-iframe" src="${redirectUrl}" width="100%" height="500" frameborder="0"></iframe>
+          </div>
+          <div class="p-4 bg-gray-50 flex justify-between">
+            <button onclick="checkPesapalStatus('${orderTrackingId}')" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+              Check Payment Status
+            </button>
+            <button onclick="closePesapalIframe()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded">
+              Cancel
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(iframeModal);
+      
+      // Listen for messages from Pesapal iframe
+      window.addEventListener('message', function(e) {
+        if (e.data === 'payment_complete' || e.data === 'payment_failed') {
+          checkPesapalStatus(orderTrackingId);
+        }
+      });
+    }
+    
+    async function checkPesapalStatus(orderTrackingId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/pesapal/status/${orderTrackingId}`);
+        const data = await response.json();
+        
+        if (data.status === 'COMPLETED' || data.payment_status === 'completed') {
+          alert('Payment successful! Your subscription is now active.');
+          closePesapalIframe();
+          hidePaymentModal();
+          
+          // Update user payment status
+          if (user) {
+            await setDoc(doc(db, 'user_payments', user.uid), {
+              status: 'approved',
+              paymentStatus: 'completed',
+              pesapalOrderId: orderTrackingId,
+              approvedAt: new Date(),
+              plan: data.plan || 'monthly',
+              amount: data.amount
+            }, { merge: true });
+            
+            // Refresh page to update access
+            window.location.reload();
+          }
+        } else if (data.status === 'PENDING' || data.payment_status === 'pending') {
+          alert('Payment is still pending. Please complete the payment on your phone.');
+        } else {
+          alert('Payment not completed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+        alert('Error checking payment status. Please contact admin.');
+      }
+    }
+    
+    function closePesapalIframe() {
+      const iframeModal = document.getElementById('pesapal-iframe-modal');
+      if (iframeModal) {
+        iframeModal.remove();
+      }
+      const payBtn = document.getElementById('pesapal-pay-btn');
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay with Mobile Money';
+      }
+    }
+    
+    // Make functions globally accessible
+    window.initiatePesapalPayment = initiatePesapalPayment;
+    window.checkPesapalStatus = checkPesapalStatus;
+    window.hidePaymentModal = hidePaymentModal;
+    window.closePesapalIframe = closePesapalIframe;
+
+    // Check if user has paid and been approved (via backend)
+    async function checkPaymentStatus(userId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/payments/status/${userId}`);
+        if (!response.ok) throw new Error('Server error checking payment status');
+        return await response.json();
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+        return { hasPaid: false, status: 'error', isNewUser: false };
+      }
+    }
+
+    // Submit payment details (via backend)
+    async function submitPaymentDetails(reference, method) {
+      if (isSubmittingPayment) {
+        console.log('⚠️ Payment submission already in progress');
+        return;
+      }
+
+      isSubmittingPayment = true;
+      console.log('🔄 Starting payment submission...');
+
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser || currentUser.isAnonymous) {
+          throw new Error('User not authenticated. Please log in again.');
+        }
+        if (!currentUser.uid || !currentUser.email) {
+          throw new Error('User ID or email is missing. Please log in again.');
+        }
+        if (!reference || reference.trim().length < 3) {
+          throw new Error('Please enter a valid payment reference (at least 3 characters)');
+        }
+        if (!method) {
+          throw new Error('Please select a payment method');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/payments/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            paymentReference: reference,
+            paymentMethod: method
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Server error submitting payment');
+        }
+
+        const submitBtn = document.getElementById('payment-submit-btn');
+        if (submitBtn) submitBtn.textContent = 'Submit Payment Details';
+        console.log('✅ Payment submitted via backend');
+        return true;
+      } catch (error) {
+        console.error('❌ Error submitting payment:', error);
+        const submitBtn = document.getElementById('payment-submit-btn');
+        if (submitBtn) submitBtn.textContent = 'Submit Payment Details';
+        throw error;
+      } finally {
+        isSubmittingPayment = false;
+      }
+    }
 
 
     // Medical student background images - rotating every 30 seconds
@@ -2097,11 +2579,11 @@ function updateUserInfo() {
                             </div>
 
                             <!-- Admin Stats Cards -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                               <div class="bg-white p-6 rounded-xl shadow-lg border border-purple-200">
                                 <div class="flex items-center justify-between">
                                   <div>
-                                    <p class="text-sm font-medium text-gray-600">Total Registered Users</p>
+                                    <p class="text-sm font-medium text-gray-600">Total Users</p>
                                     <p id="total-users" class="text-3xl font-bold text-purple-600">--</p>
                                   </div>
                                   <div class="bg-purple-100 p-3 rounded-full">
@@ -2112,15 +2594,43 @@ function updateUserInfo() {
                                 </div>
                               </div>
 
-                              <div class="bg-white p-6 rounded-xl shadow-lg border border-blue-200">
+                              <div class="bg-white p-6 rounded-xl shadow-lg border border-green-200">
                                 <div class="flex items-center justify-between">
                                   <div>
-                                    <p class="text-sm font-medium text-gray-600">Active Users</p>
-                                    <p id="active-users" class="text-3xl font-bold text-blue-600">--</p>
+                                    <p class="text-sm font-medium text-gray-600">Approved Users</p>
+                                    <p id="approved-users" class="text-3xl font-bold text-green-600">--</p>
                                   </div>
-                                  <div class="bg-blue-100 p-3 rounded-full">
-                                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <div class="bg-green-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="bg-white p-6 rounded-xl shadow-lg border border-yellow-200">
+                                <div class="flex items-center justify-between">
+                                  <div>
+                                    <p class="text-sm font-medium text-gray-600">Pending Users</p>
+                                    <p id="pending-users" class="text-3xl font-bold text-yellow-600">--</p>
+                                  </div>
+                                  <div class="bg-yellow-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="bg-white p-6 rounded-xl shadow-lg border border-red-200">
+                                <div class="flex items-center justify-between">
+                                  <div>
+                                    <p class="text-sm font-medium text-gray-600">Rejected Users</p>
+                                    <p id="rejected-users" class="text-3xl font-bold text-red-600">--</p>
+                                  </div>
+                                  <div class="bg-red-100 p-3 rounded-full">
+                                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                   </div>
                                 </div>
@@ -2169,21 +2679,18 @@ function updateUserInfo() {
                               </div>
                             </div>
 
-<!-- Users Table -->
-              <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
-                  <h3 class="text-xl font-semibold text-gray-800">User Management</h3>
-                  <button id="upload-document-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-                    Upload Document
-                  </button>
-                </div>
-                <div id="users-table" class="p-6">
-                  <div class="text-center py-8">
-                    <div class="animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent mx-auto"></div>
-                    <p class="mt-4 text-gray-500">Loading users...</p>
-                  </div>
-                </div>
-              </div>
+                            <!-- Users Table -->
+                            <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+                              <div class="p-6 border-b border-gray-200">
+                                <h3 class="text-xl font-semibold text-gray-800">User Management</h3>
+                              </div>
+                              <div id="users-table" class="p-6">
+                                <div class="text-center py-8">
+                                  <div class="animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent mx-auto"></div>
+                                  <p class="mt-4 text-gray-500">Loading users...</p>
+                                </div>
+                              </div>
+                            </div>
                         </div>
                     `;
           break;
@@ -2742,6 +3249,12 @@ function updateUserInfo() {
             </svg>
             <span>Admin Panel</span>
           </div>
+          <button id="view-pending-payments" class="w-full bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded mb-2 transition-colors">
+            Pending Payments (${getPendingPaymentsCount()})
+          </button>
+          <button id="view-approved-payments" class="w-full bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-2 rounded transition-colors">
+            Approved Users
+          </button>
         `;
       }
     }
@@ -2761,33 +3274,18 @@ function updateUserInfo() {
       }
     }
 
-// Admin Dashboard Functions - Global variables
+    // Admin Dashboard Functions - Global variables
     let allUsers = [];
     let filteredUsers = [];
     let selectedUsers = new Set();
-    let selectedDocument = null;
-    let uploadModalShown = false;
 
-    // Document upload variables
-    let uploadFile = null;
-    let uploadProgress = 0;
-    let isUploading = false;
-
-async function loadAdminDashboard() {
+    async function loadAdminDashboard() {
       try {
         console.log('Loading admin dashboard...');
         const response = await fetch(`${API_BASE_URL}/api/payments/all`);
         if (!response.ok) throw new Error('Failed to load users from server');
         const result = await response.json();
         const rawUsers = result.data || [];
-
-        // Load documents for admin dashboard
-        const docsResponse = await fetch(`${API_BASE_URL}/api/documents/all`);
-        if (docsResponse.ok) {
-          const docsResult = await docsResponse.json();
-          const rawDocs = docsResult.data || [];
-          console.log('Loaded documents:', rawDocs.length);
-        }
 
         const users = rawUsers.map(data => ({
           id: data.id,
@@ -3025,19 +3523,13 @@ async function loadAdminDashboard() {
       }
     }
 
-// Make functions globally available
+    // Make functions globally available
     window.bulkApproveUsers = bulkApproveUsers;
     window.bulkRejectUsers = bulkRejectUsers;
     window.approveSingleUser = approveSingleUser;
     window.rejectSingleUser = rejectSingleUser;
     window.deleteSingleUser = deleteSingleUser;
     window.loadAdminDashboard = loadAdminDashboard;
-
-    // Document upload functions
-    window.showUploadModal = showUploadModal;
-    window.hideUploadModal = hideUploadModal;
-    window.handleFileUpload = handleFileUpload;
-    window.uploadDocument = uploadDocument;
 
     async function bulkApproveUsers() {
       if (selectedUsers.size === 0) return;
@@ -3194,7 +3686,7 @@ async function loadAdminDashboard() {
                     </div>
                   </div>
                 </div>
-              `).join('')}`
+              `).join('')}
             </div>
           `;
         }
@@ -3250,7 +3742,7 @@ async function loadAdminDashboard() {
                     </div>
                   </div>
                 </div>
-              `).join('')}`
+              `).join('')}
             </div>
           `;
         }
@@ -3281,22 +3773,9 @@ async function loadAdminDashboard() {
       }
     }
 
-// Initialize App on load
+    // Initialize App on load
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 Starting Studypedia Uganda application...');
-      
-      // Hide preloader function
-      const hidePreloader = () => {
-        const preloader = document.getElementById('preloader');
-        if (preloader) preloader.style.display = 'none';
-      };
-      
-      // Error handler - show error and hide preloader
-      window.addEventListener('error', (e) => {
-        console.error('Global error:', e.error);
-        hidePreloader();
-      });
-      
       try {
         console.log('🔧 Initializing Firebase...');
         const app = initializeApp(firebaseConfig);
@@ -3304,13 +3783,6 @@ async function loadAdminDashboard() {
         auth = getAuth(app);
         setLogLevel('debug');
         console.log('✅ Firebase initialized successfully');
-        hidePreloader();
-
-        // Add event listener for upload button
-        const uploadBtn = document.getElementById('upload-document-btn');
-        if (uploadBtn) {
-          uploadBtn.addEventListener('click', showUploadModal);
-        }
 
         onAuthStateChanged(auth, async (currentUser) => {
           authStateChangeCount++;
@@ -3405,7 +3877,6 @@ async function loadAdminDashboard() {
           auth = getAuth(app);
           setLogLevel('debug');
           console.log('✅ Firebase initialized successfully');
-          hidePreloader();
 
           // Initialize Firebase-dependent features
           cycleBgImages();
@@ -3413,7 +3884,6 @@ async function loadAdminDashboard() {
         } catch (firebaseError) {
           console.error('❌ Firebase initialization failed:', firebaseError);
           console.log('📝 Continuing with basic functionality without Firebase');
-          hidePreloader();
         }
 
         // Enhanced back button event listeners
@@ -3450,16 +3920,13 @@ async function loadAdminDashboard() {
           }
         });
 
-// Single event delegation for all other elements (static and dynamic)
+        // Single event delegation for all other elements (static and dynamic)
         document.addEventListener('click', async (e) => {
           if (e.target.id === 'courses-button') {
             e.preventDefault();
             // Allow all users to access courses - payment will be requested after viewing 2 documents
             goToPage('courses', false);
             console.log('Courses button clicked - access granted');
-          } else if (e.target.id === 'upload-document-btn') {
-            e.preventDefault();
-            showUploadModal();
           } else if (e.target.id === 'return-home-btn' || e.target.closest('#return-home-btn')) {
             e.preventDefault();
             goToPage('home', false);
@@ -3676,11 +4143,12 @@ async function loadAdminDashboard() {
             } else if (e.target.id === 'contact-admin') {
               window.open('https://wa.me/0756454646', '_blank');
             } else if (e.target.id === 'logout-instead') {
-              if (confirm('Are you sure you want to logout?')) {
+              if (confirm('Are you sure you want to logout instead of completing payment?')) {
                 auth.signOut();
+                hidePaymentModal();
               }
             } else if (paymentForm && paymentForm.contains(e.target) && e.target.type === 'submit') {
-              // Payment form removed - no action needed
+              handlePaymentSubmission(e);
             } else if (e.target.id === 'view-pending-payments') {
               showPendingPaymentsPanel();
             } else if (e.target.id === 'view-approved-payments') {
@@ -3699,7 +4167,6 @@ async function loadAdminDashboard() {
 
       } catch (e) {
         console.error("❌ Firebase initialization failed:", e);
-        hidePreloader();
         mainContent.innerHTML = `<div class="p-8 bg-red-100 text-red-800 rounded-xl shadow-lg w-full"><h2 class="font-bold text-xl mb-2">Initialization Failed</h2><p>Could not initialize Firebase. Please check your configuration and network connection.</p><p>Error: ${e.message}</p></div>`;
       }
     });
