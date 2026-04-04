@@ -32,7 +32,7 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="https://studypedia-app.firebaseapp.com/">
   
-  <title>Studypedia Uganda</title>
+<title>Kampala School of Health Sciences Digital Library</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts - Inter -->
@@ -532,93 +532,6 @@
       </div>
     </div>
 
-    <!-- Payment Prompt Modal -->
-    <div id="payment-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4" onclick="if(event.target === this) hidePaymentModal()">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 relative">
-        <button id="close-payment-modal" class="absolute top-3 right-3 text-white bg-red-500 hover:bg-red-600 rounded-full p-3 w-12 h-12 flex items-center justify-center z-10 shadow-lg" title="Close">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-        <div class="p-6 pt-10">
-          <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-            <svg class="w-6 h-6 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            Subscription Plans
-          </h3>
-          
-          <!-- Subscription Plans -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Select Plan</label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="cursor-pointer">
-                <input type="radio" name="subscription-plan" value="monthly" class="peer sr-only" checked>
-                <div class="p-3 border-2 border-blue-500 rounded-lg bg-blue-50 peer-checked:bg-blue-500 peer-checked:text-white transition-all">
-                  <p class="font-bold">Monthly</p>
-                  <p class="text-sm">UGX 5,000/month</p>
-                </div>
-              </label>
-              <label class="cursor-pointer">
-                <input type="radio" name="subscription-plan" value="annual" class="peer sr-only">
-                <div class="p-3 border-2 border-green-500 rounded-lg hover:bg-green-50 transition-all">
-                  <p class="font-bold">Annual</p>
-                  <p class="text-sm">UGX 100,000/year</p>
-                  <p class="text-xs text-green-600 font-semibold">Save 40%</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-            <p class="text-gray-700 mb-2">Pay via Mobile Money (Pesapal)</p>
-            <p class="text-sm text-gray-600 mb-3">Payment will be processed securely through Pesapal. You'll receive a prompt on your phone to confirm.</p>
-            
-            <!-- Payment Method Selection -->
-            <div class="mb-3">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Network</label>
-              <div class="grid grid-cols-2 gap-2">
-                <label class="cursor-pointer">
-                  <input type="radio" name="payment-network" value="MTN" class="peer sr-only" checked>
-                  <div class="p-2 border-2 border-yellow-500 rounded bg-yellow-100 peer-checked:bg-yellow-500 peer-checked:text-white text-center transition-all">
-                    <span class="font-bold">MTN</span>
-                  </div>
-                </label>
-                <label class="cursor-pointer">
-                  <input type="radio" name="payment-network" value="AIRTEL" class="peer sr-only">
-                  <div class="p-2 border-2 border-red-500 rounded hover:bg-red-50 text-center transition-all">
-                    <span class="font-bold text-red-600">Airtel</span>
-                  </div>
-                </label>
-              </div>
-            </div>
-            
-            <div class="bg-white rounded p-3 border border-yellow-300">
-              <p class="text-sm font-medium text-gray-800">Phone Number for Payment</p>
-              <input type="tel" id="payment-phone" class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., 256752123456">
-              <p class="text-xs text-gray-500 mt-1">Enter your mobile money phone number</p>
-            </div>
-          </div>
-          
-          <button type="button" id="pesapal-pay-btn" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-3 px-4 rounded-md transition-colors font-bold" onclick="initiatePesapalPayment()">
-            Pay with Mobile Money
-          </button>
-          
-          <button type="button" id="browse-free-btn" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-md transition-colors font-semibold" onclick="hidePaymentModal()">
-            Continue Browsing for Free
-          </button>
-          
-          <p class="mt-3 text-center text-xs text-gray-500">
-            Secured by Pesapal. Payment processed securely.
-          </p>
-          
-          <p class="mt-4 text-center text-sm text-gray-600">
-            <button id="contact-admin" class="text-blue-500 hover:underline">Contact Admin</button> |
-            <button id="logout-instead" class="text-red-500 hover:underline">Logout Instead</button>
-          </p>
-        </div>
-      </div>
-    </div>
 
     <!-- Contact Us Modal -->
     <div id="contact-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
@@ -732,25 +645,35 @@
     // Fetch documents with time: "latest" from all course units
     async function fetchLatestDocuments() {
       try {
-        const allDocsQuery = query(collectionGroup(db, 'documents'), where('time', '==', 'latest'));
+        const allDocsQuery = query(collectionGroup(db, 'documents'));
         const snapshot = await getDocs(allDocsQuery);
         
         const docs = [];
         for (const doc of snapshot.docs) {
           const data = doc.data();
-          // Get the full path to find course info
-          const pathParts = doc.ref.path.split('/');
-          const courseId = pathParts[1];
-          const semesterId = pathParts[3];
-          const unitId = pathParts[5];
+          // Check for time: "latest" only
+          const docTime = (data.time && typeof data.time === 'object' && data.time.stringValue) ? data.time.stringValue : data.time;
           
-          docs.push({
-            id: doc.id,
-            ...data,
-            courseId,
-            semesterId,
-            unitId
-          });
+          if (docTime === 'latest') {
+            // Get the full path to find course info
+            const pathParts = doc.ref.path.split('/');
+            const courseId = pathParts[1];
+            const semesterId = pathParts[3];
+            const unitId = pathParts[5];
+            
+            // Get status field separately (for premium/free marking)
+            const docStatus = (data.status && typeof data.status === 'object' && data.status.stringValue) ? data.status.stringValue : data.status;
+            
+            docs.push({
+              id: doc.id,
+              ...data,
+              courseId,
+              semesterId,
+              unitId,
+              status: docStatus,
+              time: docTime
+            });
+          }
         }
         
         console.log('Latest documents found:', docs.length);
@@ -2679,18 +2602,21 @@ function updateUserInfo() {
                               </div>
                             </div>
 
-                            <!-- Users Table -->
-                            <div class="bg-white rounded-xl shadow-lg border border-gray-200">
-                              <div class="p-6 border-b border-gray-200">
-                                <h3 class="text-xl font-semibold text-gray-800">User Management</h3>
-                              </div>
-                              <div id="users-table" class="p-6">
-                                <div class="text-center py-8">
-                                  <div class="animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent mx-auto"></div>
-                                  <p class="mt-4 text-gray-500">Loading users...</p>
-                                </div>
-                              </div>
-                            </div>
+<!-- Users Table -->
+              <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+                <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                  <h3 class="text-xl font-semibold text-gray-800">User Management</h3>
+                  <button id="upload-document-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    Upload Document
+                  </button>
+                </div>
+                <div id="users-table" class="p-6">
+                  <div class="text-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-4 border-purple-500 border-t-transparent mx-auto"></div>
+                    <p class="mt-4 text-gray-500">Loading users...</p>
+                  </div>
+                </div>
+              </div>
                         </div>
                     `;
           break;
@@ -3274,18 +3200,33 @@ function updateUserInfo() {
       }
     }
 
-    // Admin Dashboard Functions - Global variables
+// Admin Dashboard Functions - Global variables
     let allUsers = [];
     let filteredUsers = [];
     let selectedUsers = new Set();
+    let selectedDocument = null;
+    let uploadModalShown = false;
 
-    async function loadAdminDashboard() {
+    // Document upload variables
+    let uploadFile = null;
+    let uploadProgress = 0;
+    let isUploading = false;
+
+async function loadAdminDashboard() {
       try {
         console.log('Loading admin dashboard...');
         const response = await fetch(`${API_BASE_URL}/api/payments/all`);
         if (!response.ok) throw new Error('Failed to load users from server');
         const result = await response.json();
         const rawUsers = result.data || [];
+
+        // Load documents for admin dashboard
+        const docsResponse = await fetch(`${API_BASE_URL}/api/documents/all`);
+        if (docsResponse.ok) {
+          const docsResult = await docsResponse.json();
+          const rawDocs = docsResult.data || [];
+          console.log('Loaded documents:', rawDocs.length);
+        }
 
         const users = rawUsers.map(data => ({
           id: data.id,
@@ -3523,13 +3464,19 @@ function updateUserInfo() {
       }
     }
 
-    // Make functions globally available
+// Make functions globally available
     window.bulkApproveUsers = bulkApproveUsers;
     window.bulkRejectUsers = bulkRejectUsers;
     window.approveSingleUser = approveSingleUser;
     window.rejectSingleUser = rejectSingleUser;
     window.deleteSingleUser = deleteSingleUser;
     window.loadAdminDashboard = loadAdminDashboard;
+
+    // Document upload functions
+    window.showUploadModal = showUploadModal;
+    window.hideUploadModal = hideUploadModal;
+    window.handleFileUpload = handleFileUpload;
+    window.uploadDocument = uploadDocument;
 
     async function bulkApproveUsers() {
       if (selectedUsers.size === 0) return;
@@ -3686,7 +3633,7 @@ function updateUserInfo() {
                     </div>
                   </div>
                 </div>
-              `).join('')}
+              `).join('')}`
             </div>
           `;
         }
@@ -3742,7 +3689,7 @@ function updateUserInfo() {
                     </div>
                   </div>
                 </div>
-              `).join('')}
+              `).join('')}`
             </div>
           `;
         }
@@ -3773,7 +3720,7 @@ function updateUserInfo() {
       }
     }
 
-    // Initialize App on load
+// Initialize App on load
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 Starting Studypedia Uganda application...');
       try {
@@ -3783,6 +3730,12 @@ function updateUserInfo() {
         auth = getAuth(app);
         setLogLevel('debug');
         console.log('✅ Firebase initialized successfully');
+
+        // Add event listener for upload button
+        const uploadBtn = document.getElementById('upload-document-btn');
+        if (uploadBtn) {
+          uploadBtn.addEventListener('click', showUploadModal);
+        }
 
         onAuthStateChanged(auth, async (currentUser) => {
           authStateChangeCount++;
@@ -3920,13 +3873,17 @@ function updateUserInfo() {
           }
         });
 
-        // Single event delegation for all other elements (static and dynamic)
+// Single event delegation for all other elements (static and dynamic)
         document.addEventListener('click', async (e) => {
           if (e.target.id === 'courses-button') {
             e.preventDefault();
             // Allow all users to access courses - payment will be requested after viewing 2 documents
             goToPage('courses', false);
             console.log('Courses button clicked - access granted');
+          } else if (e.target.id === 'upload-document-btn') {
+            e.preventDefault();
+            showUploadModal();
+          }
           } else if (e.target.id === 'return-home-btn' || e.target.closest('#return-home-btn')) {
             e.preventDefault();
             goToPage('home', false);
