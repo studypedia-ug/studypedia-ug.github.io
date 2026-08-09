@@ -2991,6 +2991,25 @@
           }
         });
 
+        // Direct listeners for menu open/close to avoid event delegation issues
+        const menuButton = document.getElementById('menu-button');
+        if (menuButton) {
+          menuButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+          });
+        }
+
+        const closeMenuButton = document.getElementById('close-menu-button');
+        if (closeMenuButton) {
+          closeMenuButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+          });
+        }
+
         // Single event delegation for all elements
         document.addEventListener('click', async (e) => {
           if (e.target.id === 'courses-button') {
