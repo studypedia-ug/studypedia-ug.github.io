@@ -306,13 +306,14 @@
 
     <!-- Main Content Wrapper -->
     <div class="relative z-10 flex flex-col min-h-screen">
-      <header class="bg-white shadow-md p-4 flex items-center justify-between">
+      <header class="relative z-[55] bg-white shadow-md p-4 flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <button id="menu-button" class="focus:outline-none p-2 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md">
+          <button id="menu-button" class="fixed top-4 left-4 z-[70] focus:outline-none p-2 rounded-md bg-white/90 backdrop-blur-sm hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md">
             <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
             </svg>
           </button>
+          <span class="invisible w-10 h-10 flex-shrink-0" aria-hidden="true"></span>
           <button id="home-button" class="flex items-center gap-2 hover:scale-105 transition-transform duration-300">
             <img src="https://kshs.ac.ug/images/kampala%20logo.png" alt="Studypedia Logo" class="w-10 h-10 rounded-full object-cover shadow-lg">
             <span class="text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-700 bg-clip-text text-transparent tracking-wide">KSHS Study Resources</span>
@@ -2982,29 +2983,6 @@
           this.style.transform = '';
           handleBack();
         });
-
-        const menuButton = document.getElementById('menu-button');
-        const closeMenuButton = document.getElementById('close-menu-button');
-        if (menuButton) {
-          menuButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleMenu();
-          });
-          menuButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            toggleMenu();
-          });
-        }
-        if (closeMenuButton) {
-          closeMenuButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            toggleMenu();
-          });
-          closeMenuButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            toggleMenu();
-          });
-        }
 
         // Close menu on Escape key
         document.addEventListener('keydown', function(e) {
