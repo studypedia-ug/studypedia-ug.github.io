@@ -35,6 +35,8 @@
   <title>KSHS Library Study Resources</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
   <!-- Google Fonts - Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -334,7 +336,17 @@
             </button>
           </div>
           <!-- AdSense Leaderboard Ad Space -->
-          <div id="header-ad" class="ml-auto hidden md:block w-64 h-12 bg-gradient-to-r from-gray-200 to-gray-300 rounded shadow-md"></div>
+          <div id="header-ad" class="ml-auto hidden md:block">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-9651439714273887"
+                 data-ad-slot="1234567890"
+                 data-ad-format="horizontal"
+                 data-full-width-responsive="true"></ins>
+            <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+          </div>
         </div>
         <div class="flex space-x-2">
           <!-- Enhanced Back Button -->
@@ -1185,6 +1197,11 @@
       }
       backButton.classList.toggle('hidden', page === 'home' || page === 'courses' || page === 'articles');
 
+      const headerAd = document.getElementById('header-ad');
+      if (headerAd) {
+        headerAd.classList.toggle('hidden', page === 'admin-dashboard');
+      }
+
       if (page === 'courses') {
         fetchCourses();
       }
@@ -1619,7 +1636,15 @@
 
               <!-- AdSense Banner Ad Space at Bottom of Home -->
               <div id="home-ad-bottom" class="mt-12 text-center">
-                <div class="mx-auto w-full max-w-4xl h-16 bg-gray-200 rounded-lg"></div>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-9651439714273887"
+                     data-ad-slot="0987654321"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                  (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
               </div>
             </div>
           `;
