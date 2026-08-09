@@ -447,7 +447,7 @@
     </div>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div id="login-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 relative">
         <div class="p-6">
           <h3 class="text-xl font-bold text-gray-900 mb-4">Login</h3>
@@ -475,7 +475,7 @@
     </div>
 
     <!-- Contact Us Modal -->
-    <div id="contact-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div id="contact-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div class="p-6 relative">
           <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Contact  KSHS Main Library</h2>
@@ -821,7 +821,7 @@
       if (!modal) {
         modal = document.createElement('div');
         modal.id = 'ai-response-modal';
-        modal.className = 'fixed inset-0 z-50 hidden flex items-center justify-center p-4';
+        modal.className = 'fixed inset-0 z-[60] hidden flex items-center justify-center p-4';
         modal.innerHTML = `
           <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] overflow-hidden">
             <div class="p-6">
@@ -878,7 +878,7 @@
       if (!chatModal) {
         chatModal = document.createElement('div');
         chatModal.id = 'ai-chat-modal';
-        chatModal.className = 'fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black bg-opacity-50';
+        chatModal.className = 'fixed inset-0 z-[60] hidden flex items-center justify-center p-4 bg-black bg-opacity-50';
         chatModal.innerHTML = `
           <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl h-[80vh] flex flex-col overflow-hidden">
             <div class="p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-between">
@@ -1181,6 +1181,8 @@
         fetchCourses();
       } else {
         document.body.style.overflow = '';
+        sidebar.style.overflowY = '';
+        sidebar.style.height = '';
       }
     }
 
@@ -1194,6 +1196,9 @@
         isMenuOpen = false;
         sidebar.classList.add('-translate-x-full');
         menuOverlay.classList.add('hidden');
+        document.body.style.overflow = '';
+        sidebar.style.overflowY = '';
+        sidebar.style.height = '';
       }
       backButton.classList.toggle('hidden', page === 'home' || page === 'courses' || page === 'articles');
 
