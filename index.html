@@ -637,6 +637,15 @@
 
     When helping students, always advise what to read based on their specific course and semester.`;
 
+    function getAISessionId() {
+      let sessionId = localStorage.getItem('studypedia_ai_session_id');
+      if (!sessionId) {
+        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+        localStorage.setItem('studypedia_ai_session_id', sessionId);
+      }
+      return sessionId;
+    }
+
     // UI elements
     const mainContent = document.getElementById('main-content');
     const sidebar = document.getElementById('sidebar');
@@ -793,6 +802,7 @@
               { role: 'system', content: AI_CONTEXT },
               { role: 'user', content: query }
             ],
+            sessionId: getAISessionId(),
             max_tokens: 500
           })
         });
@@ -985,6 +995,7 @@
               { role: 'system', content: systemContext + ' ' + AI_CONTEXT },
               { role: 'user', content: message }
             ],
+            sessionId: getAISessionId(),
             max_tokens: 800
           })
         });
