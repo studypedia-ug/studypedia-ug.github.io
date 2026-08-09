@@ -2986,30 +2986,24 @@
         // Direct listeners for menu open/close to avoid event delegation issues
         const menuButton = document.getElementById('menu-button');
         if (menuButton) {
-          menuButton.addEventListener('click', (e) => {
+          const toggleMenuHandler = (e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
-          });
-          menuButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-          });
+          };
+          menuButton.addEventListener('mousedown', toggleMenuHandler);
+          menuButton.addEventListener('touchstart', toggleMenuHandler, { passive: false });
         }
 
         const closeMenuButton = document.getElementById('close-menu-button');
         if (closeMenuButton) {
-          closeMenuButton.addEventListener('click', (e) => {
+          const closeMenuHandler = (e) => {
             e.preventDefault();
             e.stopPropagation();
             toggleMenu();
-          });
-          closeMenuButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-          });
+          };
+          closeMenuButton.addEventListener('mousedown', closeMenuHandler);
+          closeMenuButton.addEventListener('touchstart', closeMenuHandler, { passive: false });
         }
 
         // Single event delegation for all elements
