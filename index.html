@@ -2983,6 +2983,29 @@
           handleBack();
         });
 
+        const menuButton = document.getElementById('menu-button');
+        const closeMenuButton = document.getElementById('close-menu-button');
+        if (menuButton) {
+          menuButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleMenu();
+          });
+          menuButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            toggleMenu();
+          });
+        }
+        if (closeMenuButton) {
+          closeMenuButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleMenu();
+          });
+          closeMenuButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            toggleMenu();
+          });
+        }
+
         // Close menu on Escape key
         document.addEventListener('keydown', function(e) {
           if (e.key === 'Escape' && isMenuOpen) {
@@ -3032,22 +3055,23 @@
             goToPage('home');
           } else if (e.target.closest('#sidebar-home')) {
             e.preventDefault();
-            goToPage('home', true);
+            goToPage('home', false);
           } else if (e.target.closest('#sidebar-courses')) {
             e.preventDefault();
-            goToPage('courses', true);
+            goToPage('courses', false);
           } else if (e.target.closest('#sidebar-articles')) {
             e.preventDefault();
-            goToPage('articles', true);
+            goToPage('articles', false);
           } else if (e.target.closest('#sidebar-about')) {
             e.preventDefault();
-            goToPage('about', true);
+            goToPage('about', false);
           } else if (e.target.closest('#sidebar-contact')) {
             e.preventDefault();
+            toggleMenu();
             showModal(contactModal);
           } else if (e.target.closest('#sidebar-privacy')) {
             e.preventDefault();
-            goToPage('privacy', true);
+            goToPage('privacy', false);
           } else {
             const courseBtn = e.target.closest('.select-course');
             if (courseBtn) {
