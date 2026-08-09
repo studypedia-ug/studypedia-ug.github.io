@@ -372,7 +372,7 @@
     <div id="sidebar" class="fixed top-0 left-0 h-screen transform -translate-x-full transition-transform duration-500 ease-in-out bg-gradient-to-b from-white to-blue-50 w-72 md:w-72 shadow-2xl z-50 overflow-y-auto">
       <div class="p-4 flex justify-between items-center border-b border-blue-100 bg-white">
         <h3 class="text-lg font-bold text-blue-600">Menu</h3>
-        <button id="close-menu-button" class="text-gray-600 hover:text-red-500 transition-all duration-300 ease-in-out transform hover:scale-110 p-1">
+        <button id="close-menu-button" class="focus:outline-none p-2 rounded-md hover:bg-red-50 hover:text-red-500 transition-all duration-300 ease-in-out transform hover:scale-110 shadow-sm">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -465,7 +465,7 @@
             </div>
             <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors">Login</button>
           </form>
-          <button id="close-login-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+          <button id="close-login-modal" class="absolute top-4 right-4 focus:outline-none p-2 rounded-md hover:bg-red-50 hover:text-red-500 transition-all duration-300 ease-in-out transform hover:scale-110 shadow-sm">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -493,7 +493,7 @@
             WhatsApp: 0756454646
           </a>
           
-          <button id="close-contact-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+          <button id="close-contact-modal" class="absolute top-4 right-4 focus:outline-none p-2 rounded-md hover:bg-red-50 hover:text-red-500 transition-all duration-300 ease-in-out transform hover:scale-110 shadow-sm">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -842,7 +842,7 @@
                   </svg>
                   AI Assistant
                 </h3>
-                <button id="close-ai-modal" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <button id="close-ai-modal" class="focus:outline-none p-2 rounded-md hover:bg-gray-100 hover:text-gray-600 transition-all duration-300 ease-in-out transform hover:scale-110 shadow-sm">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
@@ -898,7 +898,7 @@
                 </svg>
                 <span class="font-bold text-lg">AI Study Assistant</span>
               </div>
-              <button id="close-ai-chat" class="text-white hover:text-gray-200">
+              <button id="close-ai-chat" class="focus:outline-none p-2 rounded-md hover:bg-white/20 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-110">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
@@ -3019,32 +3019,33 @@
           } else if (e.target.id === 'privacy-button') {
             e.preventDefault();
             goToPage('privacy', false);
-          } else if (e.target.id === 'menu-button') {
+          } else if (e.target.closest('#menu-button')) {
             e.preventDefault();
             toggleMenu();
-          } else if (e.target.id === 'close-menu-button') {
+          } else if (e.target.closest('#close-menu-button')) {
+            e.preventDefault();
             toggleMenu();
           } else if (e.target.id === 'menu-overlay') {
             toggleMenu();
-          } else if (e.target.id === 'home-button') {
+          } else if (e.target.closest('#home-button')) {
             e.preventDefault();
             goToPage('home');
-          } else if (e.target.id === 'sidebar-home') {
+          } else if (e.target.closest('#sidebar-home')) {
             e.preventDefault();
             goToPage('home', true);
-          } else if (e.target.id === 'sidebar-courses') {
+          } else if (e.target.closest('#sidebar-courses')) {
             e.preventDefault();
             goToPage('courses', true);
-          } else if (e.target.id === 'sidebar-articles') {
+          } else if (e.target.closest('#sidebar-articles')) {
             e.preventDefault();
             goToPage('articles', true);
-          } else if (e.target.id === 'sidebar-about') {
+          } else if (e.target.closest('#sidebar-about')) {
             e.preventDefault();
             goToPage('about', true);
-          } else if (e.target.id === 'sidebar-contact') {
+          } else if (e.target.closest('#sidebar-contact')) {
             e.preventDefault();
             showModal(contactModal);
-          } else if (e.target.id === 'sidebar-privacy') {
+          } else if (e.target.closest('#sidebar-privacy')) {
             e.preventDefault();
             goToPage('privacy', true);
           } else {
@@ -3140,7 +3141,7 @@
               } else {
                 hideModal(contactModal);
               }
-            } else if (e.target.id === 'admin-dashboard-button' || e.target.id === 'admin-access-button') {
+            } else if (e.target.closest('#admin-dashboard-button') || e.target.closest('#admin-access-button')) {
               goToPage('admin-dashboard', false);
             } else if (e.target.id === 'tab-users' || e.target.id === 'tab-documents' || e.target.id === 'tab-articles') {
               // Handled by setupAdminDashboardEventListeners
