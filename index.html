@@ -506,7 +506,7 @@
   <!-- Firebase SDK Imports -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getFirestore, collection, getDocs, addDoc, deleteDoc, writeBatch, setLogLevel, onSnapshot, query, collectionGroup, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
     import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
@@ -2536,6 +2536,8 @@
       const generatedPassword = `LIB-${courseCode}-${currentYear}-${personalNumber}`;
 
       try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, generatedPassword);
+        
         await addDoc(collection(db, 'users'), {
           name: name,
           email: email,
@@ -2545,7 +2547,8 @@
           registeredAt: new Date(),
           loginMethod: 'admin',
           courseCode: courseCode,
-          generatedPassword: generatedPassword
+          generatedPassword: generatedPassword,
+          uid: userCredential.user.uid
         });
         
         alert(`User "${name}" registered successfully!\n\n🔑 Generated Password: ${generatedPassword}\n\nPlease copy this password and share it with the user. They will use it to login.`);
@@ -2558,7 +2561,11 @@
         await loadAdminDashboard();
       } catch (error) {
         console.error('Error registering user:', error);
-        alert('Error registering user: ' + error.message);
+        if (error.code === 'auth/email-already-in-use') {
+          alert('A user with this email already exists in Firebase Auth. The Firestore record was not created. Please use a different email or reset the existing account password.');
+        } else {
+          alert('Error registering user: ' + error.message);
+        }
       }
     }
 
