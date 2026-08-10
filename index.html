@@ -2959,23 +2959,25 @@
         console.log('📱 Initial content rendered');
 
         // Enhanced back button event listeners
-        backButton.addEventListener('click', function(e) {
-          e.preventDefault();
-          this.style.transform = 'scale(0.95)';
-          setTimeout(() => {
+        if (backButton) {
+          backButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+              this.style.transform = '';
+            }, 150);
+            handleBack();
+          });
+
+          backButton.addEventListener('touchstart', function(e) {
+            this.style.transform = 'scale(0.95)';
+          });
+
+          backButton.addEventListener('touchend', function(e) {
             this.style.transform = '';
-          }, 150);
-          handleBack();
-        });
-
-        backButton.addEventListener('touchstart', function(e) {
-          this.style.transform = 'scale(0.95)';
-        });
-
-        backButton.addEventListener('touchend', function(e) {
-          this.style.transform = '';
-          handleBack();
-        });
+            handleBack();
+          });
+        }
 
         // Close menu on Escape key
         document.addEventListener('keydown', function(e) {
