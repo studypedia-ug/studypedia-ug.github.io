@@ -1222,7 +1222,9 @@
         sidebar.style.overflowY = '';
         sidebar.style.height = '';
       }
-      backButton.classList.toggle('hidden', page === 'home' || page === 'courses' || page === 'articles');
+      if (backButton) {
+        backButton.classList.toggle('hidden', page === 'home' || page === 'courses' || page === 'articles');
+      }
 
       const headerAd = document.getElementById('header-ad');
       if (headerAd) {
