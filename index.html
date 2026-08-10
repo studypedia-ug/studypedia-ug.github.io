@@ -2981,29 +2981,6 @@
           }
         });
 
-        // Direct listeners for menu open/close to avoid event delegation issues
-        const menuButton = document.getElementById('menu-button');
-        if (menuButton) {
-          const toggleMenuHandler = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-          };
-          menuButton.addEventListener('mousedown', toggleMenuHandler);
-          menuButton.addEventListener('touchstart', toggleMenuHandler, { passive: false });
-        }
-
-        const closeMenuButton = document.getElementById('close-menu-button');
-        if (closeMenuButton) {
-          const closeMenuHandler = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMenu();
-          };
-          closeMenuButton.addEventListener('mousedown', closeMenuHandler);
-          closeMenuButton.addEventListener('touchstart', closeMenuHandler, { passive: false });
-        }
-
         // Single event delegation for all elements
         document.addEventListener('click', async (e) => {
           if (e.target.id === 'courses-button') {
