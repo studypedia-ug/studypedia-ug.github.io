@@ -1932,7 +1932,7 @@
               <!-- ===== USERS SECTION ===== -->
               <div id="admin-users-section">
                 <!-- Admin Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   <div class="bg-white p-6 rounded-xl shadow-lg border border-purple-200">
                     <div class="flex items-center justify-between">
                       <div>
@@ -1955,19 +1955,6 @@
                       <div class="bg-green-100 p-3 rounded-full">
                         <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <p class="text-sm font-medium text-gray-600">Google Signups</p>
-                        <p id="google-users" class="text-3xl font-bold text-gray-600">--</p>
-                      </div>
-                      <div class="bg-gray-100 p-3 rounded-full">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
                       </div>
                     </div>
@@ -2345,15 +2332,13 @@
         allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         filteredUsers = allUsers;
 
-        const stats = { total: allUsers.length, active: 0, google: 0 };
+        const stats = { total: allUsers.length, active: 0 };
         allUsers.forEach(u => {
           if (u.status === 'active' || !u.status) stats.active++;
-          if (u.loginMethod === 'google') stats.google++;
         });
 
         if (document.getElementById('total-users')) document.getElementById('total-users').textContent = stats.total;
         if (document.getElementById('active-users')) document.getElementById('active-users').textContent = stats.active;
-        if (document.getElementById('google-users')) document.getElementById('google-users').textContent = stats.google;
 
         renderAdminUsersTable();
 
@@ -2446,7 +2431,6 @@
                   <div class="text-sm text-gray-500 space-y-1 mt-1">
                     ${user.phone ? `<p>📞 ${user.phone}</p>` : ''}
                     <p>Registered: ${dateStr}</p>
-                    ${user.loginMethod ? `<p class="text-blue-600 font-semibold">Signup: ${user.loginMethod === 'google' ? 'Google Sign-In' : 'Email/Password'}</p>` : ''}
                   </div>
                 </div>
               </div>
