@@ -863,15 +863,19 @@
     }
     
     // Event listeners for AI search
-    aiSearchBtn.addEventListener('click', () => {
-      performAISearch(aiSearchInput.value);
-    });
-    
-    aiSearchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
+    if (aiSearchBtn) {
+      aiSearchBtn.addEventListener('click', () => {
         performAISearch(aiSearchInput.value);
-      }
-    });
+      });
+    }
+    
+    if (aiSearchInput) {
+      aiSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          performAISearch(aiSearchInput.value);
+        }
+      });
+    }
     
     // Chat Modal for AI Assistant
     function showAIChatModal(pageType, contextName) {
