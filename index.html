@@ -2496,6 +2496,10 @@
                       class="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded text-sm transition-colors">
                 📋 Copy
               </button>
+              <button onclick="adminDeleteUser('${user.id}')" 
+                      class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-sm transition-colors">
+                🗑️ Delete
+              </button>
             </div>
           </div>
         `;
@@ -2616,6 +2620,7 @@
           allUsers = allUsers.filter(u => u.id !== userId);
           filteredUsers = filteredUsers.filter(u => u.id !== userId);
           renderAdminUsersTable();
+          renderAdminPasswordsTable();
           
           alert('User deleted successfully from both Firebase Auth and Firestore!');
         } catch (error) {
