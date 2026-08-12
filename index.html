@@ -1327,7 +1327,7 @@
           }
         } catch (error) {
           console.error('Error loading semesters on main page:', error);
-          semestersList.innerHTML = `<p class="text-center text-red-500 py-4">Failed to load semesters. Please try again.<br><small class="text-gray-500">${error.message}</small></p>`;
+          semestersList.innerHTML = `<p class="text-center text-red-500 py-4">Failed to load semesters.<br><small class="text-gray-500">Path: RESOURCES_STUDYPEDIA/${courseId}/semesters<br>Error: ${error.message}</small></p>`;
         }
       }
     }
@@ -1349,7 +1349,7 @@
           `).join('');
         } catch (error) {
           console.error('Error loading semesters in sidebar:', error);
-          semestersList.innerHTML = '<li class="text-red-500 pl-6">Error loading semesters</li>';
+          semestersList.innerHTML = `<li class="text-red-500 pl-6">Error loading semesters<br><small class="text-gray-500">${error.message}</small></li>`;
         }
       }
     }
