@@ -2664,7 +2664,7 @@
       }
 
       btn.disabled = true;
-      statusEl.textContent = 'Seeding semesters...';
+      statusEl.textContent = 'Seeding semesters and documents...';
       
       const courses = [
         { id: 'CERTIFICATE MIDWIFERY', count: 4 },
@@ -2672,26 +2672,58 @@
         { id: 'DIPLOMA NURSING', count: 6 }
       ];
 
+      const sampleDocTitles = [
+        'Lecture Notes - Chapter 1',
+        'Lecture Notes - Chapter 2',
+        'Past Paper - Mid Semester',
+        'Past Paper - End of Semester',
+        'Practice Questions',
+        'Study Guide',
+        'Lab Manual',
+        'Tutorial Sheet',
+        'Revision Notes',
+        'Reference Material'
+      ];
+
       try {
         for (const course of courses) {
           const semestersRef = collection(db, `RESOURCES_STUDYPEDIA/${course.id}/semesters`);
+          
           for (let i = 1; i <= course.count; i++) {
             const year = Math.ceil(i / 2);
             const sem = i % 2 === 1 ? 1 : 2;
-            const name = `Year ${year} Semester ${sem}`;
-            await addDoc(semestersRef, {
-              name: name,
+            const semesterName = `Year ${year} Semester ${sem}`;
+            const semesterDoc = await addDoc(semestersRef, {
+              name: semesterName,
               createdAt: new Date()
             });
+            
+            const courseunitsRef = collection(db, `RESOURCES_STUDYPEDIA/${course.id}/semesters/${semesterDoc.id}/courseunits`);
+            const unitDoc = await addDoc(courseunitsRef, {
+              name: 'General Course Unit',
+              createdAt: new Date()
+            });
+            
+            const documentsRef = collection(db, `RESOURCES_STUDYPEDIA/${course.id}/semesters/${semesterDoc.id}/courseunits/${unitDoc.id}/documents`);
+            
+            for (let d = 0; d < 10; d++) {
+              await addDoc(documentsRef, {
+                title: `${semesterName} - ${sampleDocTitles[d]}`,
+                filePath: `https://drive.google.com/file/d/SAMPLE_${course.id.replace(/\s+/g, '_')}_${semesterDoc.id}_${d}/view`,
+                description: `Sample document for ${semesterName}`,
+                time: d === 0 ? 'latest' : 'archived',
+                createdAt: new Date()
+              });
+            }
           }
         }
         
         localStorage.setItem('studypedia_semesters_seeded', 'true');
         btn.classList.add('hidden');
-        statusEl.textContent = '✅ Semesters seeded successfully!';
+        statusEl.textContent = '✅ Semesters and documents seeded successfully!';
       } catch (error) {
         console.error('Error seeding semesters:', error);
-        statusEl.textContent = '❌ Error seeding semesters: ' + error.message;
+        statusEl.textContent = '❌ Error seeding: ' + error.message;
         btn.disabled = false;
       }
     }
