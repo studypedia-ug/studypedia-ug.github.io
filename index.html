@@ -2341,7 +2341,7 @@
         }
       }, (error) => {
         console.error("Error fetching documents:", error);
-        mainContent.innerHTML = `<div class="p-8 bg-white bg-opacity-80 backdrop-blur-sm rounded-xl shadow-lg"><p class="text-center text-red-500 py-8">Failed to load documents. Please try again.</p></div>`;
+        mainContent.innerHTML = `<div class="p-8 bg-white bg-opacity-80 backdrop-blur-sm rounded-xl shadow-lg"><p class="text-center text-red-500 py-8">Failed to load documents. Please try again.<br><small class="text-gray-500">Path: RESOURCES_STUDYPEDIA/${selectedCourse}/semesters/${selectedSemester}/courseunits/${selectedCourseUnit}/documents<br>Error: ${error.message}</small></p></div>`;
       });
     }
 
