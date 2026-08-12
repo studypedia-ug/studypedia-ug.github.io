@@ -1974,6 +1974,16 @@
                   </div>
                 </div>
 
+                <!-- Semester Seeding Section -->
+                <div id="admin-seed-section" class="bg-white p-6 rounded-xl shadow-lg border border-yellow-200 mb-6">
+                  <h3 class="text-xl font-semibold text-gray-800 mb-2">🌱 Semester Seeding</h3>
+                  <p class="text-sm text-gray-600 mb-4">One-time setup to create default semesters for Certificate in Midwifery, Certificate in Nursing, and Diploma in Nursing.</p>
+                  <button id="admin-seed-semesters-btn" class="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all">
+                    🌱 Seed Semesters
+                  </button>
+                  <p id="admin-seed-status" class="mt-3 text-sm text-gray-600"></p>
+                </div>
+
                 <!-- Register New User Form -->
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 mb-6">
                   <h3 class="text-xl font-semibold text-gray-800 mb-4">➕ Register New User</h3>
@@ -2362,6 +2372,11 @@
         if (document.getElementById('active-users')) document.getElementById('active-users').textContent = stats.active;
         if (document.getElementById('google-users')) document.getElementById('google-users').textContent = stats.google;
 
+        const seedSection = document.getElementById('admin-seed-section');
+        if (seedSection && localStorage.getItem('studypedia_semesters_seeded') === 'true') {
+          seedSection.classList.add('hidden');
+        }
+
         renderAdminUsersTable();
 
         // Load courses for document form
@@ -2623,6 +2638,50 @@
       }
     }
 
+    async function seedSemesters() {
+      const statusEl = document.getElementById('admin-seed-status');
+      const btn = document.getElementById('admin-seed-semesters-btn');
+      
+      if (!btn || !statusEl) return;
+      
+      if (localStorage.getItem('studypedia_semesters_seeded') === 'true') {
+        btn.classList.add('hidden');
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.textContent = 'Seeding semesters...';
+      
+      const courses = [
+        { id: 'CERTIFICATE MIDWIFERY', count: 4 },
+        { id: 'CERTIFICATE NURSING', count: 5 },
+        { id: 'DIPLOMA NURSING', count: 6 }
+      ];
+
+      try {
+        for (const course of courses) {
+          const semestersRef = collection(db, `RESOURCES_STUDYPEDIA/${course.id}/semesters`);
+          for (let i = 1; i <= course.count; i++) {
+            const year = Math.ceil(i / 2);
+            const sem = i % 2 === 1 ? 1 : 2;
+            const name = `Year ${year} Semester ${sem}`;
+            await addDoc(semestersRef, {
+              name: name,
+              createdAt: new Date()
+            });
+          }
+        }
+        
+        localStorage.setItem('studypedia_semesters_seeded', 'true');
+        btn.classList.add('hidden');
+        statusEl.textContent = '✅ Semesters seeded successfully!';
+      } catch (error) {
+        console.error('Error seeding semesters:', error);
+        statusEl.textContent = '❌ Error seeding semesters: ' + error.message;
+        btn.disabled = false;
+      }
+    }
+
     function filterAdminUsers() {
       const searchTerm = document.getElementById('user-search')?.value.toLowerCase() || '';
       filteredUsers = allUsers.filter(user => {
@@ -2862,6 +2921,10 @@
       // Refresh
       const refreshBtn = document.getElementById('refresh-users');
       if (refreshBtn) refreshBtn.addEventListener('click', () => loadAdminDashboard());
+
+      // Seed semesters
+      const seedBtn = document.getElementById('admin-seed-semesters-btn');
+      if (seedBtn) seedBtn.addEventListener('click', seedSemesters);
 
       // Document form - course select
       const courseSelect = document.getElementById('admin-doc-course');
