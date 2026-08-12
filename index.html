@@ -1327,7 +1327,7 @@
           }
         } catch (error) {
           console.error('Error loading semesters on main page:', error);
-          semestersList.innerHTML = '<p class="text-center text-red-500 py-4">Failed to load semesters. Please try again.</p>';
+          semestersList.innerHTML = `<p class="text-center text-red-500 py-4">Failed to load semesters. Please try again.<br><small class="text-gray-500">${error.message}</small></p>`;
         }
       }
     }
