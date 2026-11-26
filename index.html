@@ -330,7 +330,7 @@
     <div class="absolute inset-0 bg-blue-900 opacity-70"></div>
 
     <!-- Main Content Wrapper -->
-    <div class="relative flex flex-col min-h-screen">
+    <div class="relative flex flex-col flex-1">
       <header class="relative bg-white shadow-md p-2 md:p-4 flex items-center justify-between gap-2" style="z-index: 60;">
         <div class="flex items-center gap-2">
           <button id="menu-button" class="focus:outline-none p-3 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md flex-shrink-0 touch-manipulation" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
@@ -519,6 +519,10 @@
         </div>
       </div>
     </div>
+  <!-- Footer -->
+  <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
+    <p class="text-center text-sm text-gray-500">© <span id="current-year"></span> KSHS Study Resources — Kampala School of Health Sciences Main Library. Developed by <a href="https://quranhub1.github.io/joes-technologies/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">JOES TECHNOLOGIES</a></p>
+  </footer>
   </div>
 
   <!-- Firebase SDK Imports -->
@@ -3293,9 +3297,6 @@
     const yearSpan = document.getElementById('current-year');
     if (yearSpan) yearSpan.textContent = new Date().getFullYear();
   </script>
-  <footer class="bg-white border-t border-gray-200 py-4 mt-auto">
-    <p class="text-center text-sm text-gray-500">© <span id="current-year"></span> KSHS Study Resources — Kampala School of Health Sciences Main Library. Developed by <a href="https://joestech.com" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">JOES TECHNOLOGIES</a></p>
-  </footer>
 </body>
 
 </html>
