@@ -322,7 +322,7 @@
 
 <body class="bg-gray-50">
   <!-- Main App Container -->
-  <div id="app" class="relative flex flex-col min-h-screen font-sans">
+  <div id="app" class="relative flex flex-col min-h-screen font-sans" style="min-height:100vh; height:auto;">
     <!-- Background Images -->
     <div id="bg-image" class="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out"></div>
 
@@ -330,7 +330,7 @@
     <div class="absolute inset-0 bg-blue-900 opacity-70"></div>
 
     <!-- Main Content Wrapper -->
-    <div class="relative flex flex-col flex-1">
+    <div id="page-shell" class="relative flex flex-col flex-1" style="flex:1 0 auto; min-height:0;">
       <header class="relative bg-white shadow-md p-2 md:p-4 flex items-center justify-between gap-2" style="z-index: 60;">
         <div class="flex items-center gap-2">
           <button id="menu-button" class="focus:outline-none p-3 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md flex-shrink-0 touch-manipulation" style="touch-action: manipulation; -webkit-tap-highlight-color: transparent;">
@@ -378,7 +378,7 @@
       </header>
 
       <!-- Main Content Area -->
-      <main id="main-content" class="flex-grow p-4 md:p-8 flex items-center justify-center transition-all duration-500 ease-in-out">
+      <main id="main-content" class="flex-grow p-4 md:p-8 flex items-center justify-center transition-all duration-500 ease-in-out" style="flex:1 0 auto; min-height:1px;">
         <!-- Content will be dynamically injected here -->
       </main>
     </div>
@@ -520,7 +520,7 @@
       </div>
     </div>
   <!-- Footer -->
-  <footer id="site-footer" class="relative z-50 block visible w-full shrink-0 bg-white border-t border-gray-200 py-4 mt-auto opacity-100" style="display:block; visibility:visible; opacity:1;">
+  <footer id="site-footer" class="relative z-50 block visible w-full shrink-0 bg-white border-t border-gray-200 py-4 mt-auto opacity-100" style="display:block; position:relative; flex:0 0 auto; width:100%; min-height:56px; margin-top:auto; clear:both; visibility:visible; opacity:1;">
     <p class="text-center text-sm text-gray-500">© <span id="current-year"></span> KSHS Study Resources — Kampala School of Health Sciences Main Library. Developed by <a href="https://quranhub1.github.io/joes-technologies/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold">JOES TECHNOLOGIES</a></p>
   </footer>
   </div>
